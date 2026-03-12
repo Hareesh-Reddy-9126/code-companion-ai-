@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_repositories_user_github_repo ON public.repositories (user_id, github_repo_id);

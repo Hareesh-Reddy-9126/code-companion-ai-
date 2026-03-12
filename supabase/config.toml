@@ -1,0 +1,13 @@
+project_id = "totmebhamyrmjbzkcogg"
+
+[functions.github-callback]
+verify_jwt = false
+
+[functions.analyze-repo]
+verify_jwt = false
+
+[functions.analyze-pr]
+verify_jwt = false
+
+[functions.github-auth-url]
+verify_jwt = false
