@@ -143,13 +143,12 @@ The app will be available at [http://localhost:8080](http://localhost:8080)
 
 ---
 
+
 ## 🖼️ Screenshots
 
-> _Add screenshots here to showcase the dashboard UI, code review, security scan, and performance analytics._
-
 <div align="center">
-  <img src="https://via.placeholder.com/800x400?text=Dashboard+Screenshot" alt="Dashboard Screenshot" />
-  <img src="https://via.placeholder.com/800x400?text=Code+Review+Screenshot" alt="Code Review Screenshot" />
+  <img src="public/images/dashboard.png" alt="Dashboard Screenshot" width="800" />
+  <img src="public/images/code-review.png" alt="Code Review Screenshot" width="800" />
 </div>
 
 ---
