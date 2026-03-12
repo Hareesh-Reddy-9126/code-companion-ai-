@@ -147,8 +147,8 @@ The app will be available at [http://localhost:8080](http://localhost:8080)
 ## 🖼️ Screenshots
 
 <div align="center">
-  <img src="public/images/dashboard.png" alt="Dashboard Screenshot" width="800" />
-  <img src="public/images/code-review.png" alt="Code Review Screenshot" width="800" />
+  <img src="images/dashboard.png" alt="Dashboard Screenshot" width="800" />
+  <img src="images/code-review.png" alt="Code Review Screenshot" width="800" />
 </div>
 
 ---
