@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.admin-stats]
 verify_jwt = true
+
+[functions.autonomous-fix]
+verify_jwt = true

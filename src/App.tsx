@@ -29,6 +29,8 @@ import Enterprise from "./pages/Enterprise";
 import ApiDocs from "./pages/ApiDocs";
 import Pricing from "./pages/Pricing";
 import Features from "./pages/Features";
+import AutonomousAgent from "./pages/AutonomousAgent";
+import Billing from "./pages/Billing";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +67,8 @@ const App = () => (
               <Route path="/history" element={<History />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/billing" element={<Billing />} />
+              <Route path="/autonomous-agent" element={<AutonomousAgent />} />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>
             <Route path="*" element={<NotFound />} />

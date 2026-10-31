@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: code-companion-frontend
+  namespace: code-companion
+  labels:
+    app: code-companion
+    component: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: code-companion
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: code-companion
+        component: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: codecompanion/frontend:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: VITE_SUPABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: code-companion-secrets
+                  key: VITE_SUPABASE_URL
+            - name: VITE_SUPABASE_PUBLISHABLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: code-companion-secrets
+                  key: VITE_SUPABASE_PUBLISHABLE_KEY
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      imagePullSecrets:
+        - name: registry-credentials
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: code-companion-frontend
+  namespace: code-companion
+spec:
+  selector:
+    app: code-companion
+    component: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: code-companion-ingress
+  namespace: code-companion
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  tls:
+    - hosts:
+        - api.codecompanion.ai
+      secretName: codecompanion-tls
+  rules:
+    - host: api.codecompanion.ai
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: code-companion-frontend
+                port:
+                  number: 80
