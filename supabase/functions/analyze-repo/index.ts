@@ -1,120 +1,252 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import {
+  corsResponse,
+  optionsResponse,
+} from "../_shared/cors.ts";
+import {
+  getUserIdFromRequest,
+  serviceClient,
+} from "../_shared/auth.ts";
+import { fetchRepoFiles } from "../_shared/github.ts";
+import {
+  callNVIDIA,
+  extractJson,
+  toAnalysisResult,
+} from "../_shared/ai.ts";
+import { decrypt } from "../_shared/crypto.ts";
 
-const IGNORED_DIRS = ["node_modules", "build", "dist", ".git", ".next", "__pycache__", "vendor", ".venv"];
-const CODE_EXTENSIONS = [".js", ".ts", ".tsx", ".jsx", ".py", ".java", ".html", ".css", ".go", ".rs", ".rb"];
+const SYSTEM_PROMPT = `You are a senior staff engineer at a top-tier tech company performing a comprehensive codebase review.
 
-// Recursively fetch code files from a GitHub repository
-async function fetchRepoFiles(owner: string, repo: string, token: string, path = ""): Promise<{ path: string; content: string }[]> {
-  const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github.v3+json" },
-  });
+Analyze the repository files below and return a SINGLE JSON object with NO markdown fences, NO extra text, and NO explanations outside the JSON.
 
-  if (!response.ok) return [];
-  const items = await response.json();
-  if (!Array.isArray(items)) return [];
-
-  const codeFiles: { path: string; content: string }[] = [];
-
-  for (const item of items) {
-    // Skip ignored directories
-    if (item.type === "dir") {
-      if (IGNORED_DIRS.some((dir) => item.name === dir)) continue;
-      const subDirFiles = await fetchRepoFiles(owner, repo, token, item.path);
-      codeFiles.push(...subDirFiles);
-    } else if (item.type === "file") {
-      const extension = "." + item.name.split(".").pop();
-      if (!CODE_EXTENSIONS.includes(extension)) continue;
-      if (item.size > 50000) continue; // skip very large files
-
-      const contentResponse = await fetch(item.download_url);
-      if (contentResponse.ok) {
-        const fileContent = await contentResponse.text();
-        codeFiles.push({ path: item.path, content: fileContent.substring(0, 3000) }); // limit per file
-      }
-    }
-    // Limit total files analyzed for performance
-    if (codeFiles.length >= 30) break;
-  }
-
-  return codeFiles;
+Required JSON schema:
+{
+  "quality_score": <number 0-100>,
+  "security_score": <number 0-100>,
+  "performance_score": <number 0-100>,
+  "architecture_score": <number 0-100>,
+  "summary": "<2-3 sentence executive summary>",
+  "strengths": ["<strength 1>", "<strength 2>", "..."],
+  "weaknesses": ["<weakness 1>", "<weakness 2>", "..."],
+  "suggestions": ["<actionable suggestion 1>", "..."],
+  "refactoring": ["<refactoring idea 1>", "..."],
+  "security_issues": [
+    {"file": "<path>", "severity": "critical|high|medium|low", "issue": "<description>", "line": <optional number>}
+  ],
+  "overall_assessment": "approve|request_changes|comment"
 }
 
+Focus on: hardcoded secrets, SQL injection, XSS, weak authentication, inefficient loops, bundle size, modularity, and separation of concerns. Be concise but specific.`;
+
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return optionsResponse();
+  if (req.method !== "POST") {
+    return corsResponse({ error: "Method not allowed" }, { status: 405 });
+  }
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-    const userId = claimsData.claims.sub;
+    const userId = await getUserIdFromRequest(req);
+    const admin = serviceClient();
 
     const { repoId, analysisType = "full_review" } = await req.json();
-
-    // Get repo and user's GitHub token
-    const adminClient = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-
-    const { data: repo } = await adminClient.from("repositories").select("*").eq("id", repoId).eq("user_id", userId).single();
-    if (!repo) {
-      return new Response(JSON.stringify({ error: "Repository not found" }), { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (!repoId) {
+      return corsResponse({ error: "Missing repoId" }, { status: 400 });
     }
 
-    const { data: profile } = await adminClient.from("profiles").select("github_access_token").eq("user_id", userId).single();
-    if (!profile?.github_access_token) {
-      return new Response(JSON.stringify({ error: "GitHub not connected" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    // Verify repo ownership
+    const { data: repo, error: repoError } = await admin
+      .from("repositories")
+      .select("*")
+      .eq("id", repoId)
+      .eq("user_id", userId)
+      .single();
+    if (repoError || !repo) {
+      return corsResponse({ error: "Repository not found" }, { status: 404 });
     }
 
-    // Parse owner/repo from repo_name
+    // Decrypt GitHub token from isolated credentials table
+    const { data: creds } = await admin
+      .from("github_credentials")
+      .select("encrypted_token")
+      .eq("user_id", userId)
+      .single();
+    if (!creds?.encrypted_token) {
+      return corsResponse(
+        {
+          error: "GitHub not connected. Please connect your GitHub account first.",
+        },
+        { status: 400 },
+      );
+    }
+    const token = await decrypt(creds.encrypted_token);
+
+    // Create analysis job
+    const { data: job, error: jobError } = await admin
+      .from("analysis_jobs")
+      .insert({
+        user_id: userId,
+        repo_id: repoId,
+        analysis_type: analysisType,
+        status: "fetching",
+      })
+      .select()
+      .single();
+    if (jobError) throw jobError;
+
+    // Fetch code files from GitHub
     const [owner, repoName] = repo.repo_name.split("/");
+    const files = await fetchRepoFiles(owner, repoName, token, {
+      maxFiles: 25,
+      maxKbPerFile: 50,
+      totalKbCap: 300,
+    });
 
-    // Fetch code files
-    const files = await fetchRepoFiles(owner, repoName, profile.github_access_token);
     if (files.length === 0) {
-      return new Response(JSON.stringify({ error: "No analyzable files found" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      await admin
+        .from("analysis_jobs")
+        .update({
+          status: "failed",
+          error_message: "No analyzable files found",
+          completed_at: new Date().toISOString(),
+        })
+        .eq("id", job.id);
+      return corsResponse(
+        { error: "No analyzable files found in repository" },
+        { status: 400 },
+      );
     }
 
-    const codeContext = files.map((f) => `--- ${f.path} ---\n${f.content}`).join("\n\n");
+    await admin
+      .from("analysis_jobs")
+      .update({
+        status: "analyzing",
+        started_at: new Date().toISOString(),
+      })
+      .eq("id", job.id);
 
-    const systemPrompt = `You are a senior software engineer reviewing a GitHub repository. Analyze the following codebase and provide a detailed review.`;
+    // Build code context for the AI
+    const codeContext = files
+      .map((f) => `--- ${f.path} ---\n${f.content}`)
+      .join("\n\n");
 
-    const analysisPrompts: Record<string, string> = {
-      full_review: `Analyze this codebase comprehensively. Provide: code quality score (0-100), security score (0-100), performance score (0-100), architecture score (0-100), strengths, weaknesses, suggestions, refactoring ideas, and best practices.`,
-      security: `Focus on security analysis. Look for: hardcoded API keys/secrets, SQL injection patterns, XSS vulnerabilities, unsafe dependencies, weak validation, authentication issues. Provide a security score (0-100) and detailed findings.`,
-      performance: `Focus on performance analysis. Look for: inefficient loops, memory issues, heavy dependencies, unoptimized queries, blocking operations, bundle size issues. Provide a performance score (0-100) and optimization suggestions.`,
-      architecture: `Analyze the project architecture. Detect: project structure patterns (MVC, layered, component-based), separation of concerns, code modularity, reusable modules. Provide an architecture score (0-100) and feedback.`,
-    };
-
-    const userPrompt = `${analysisPrompts[analysisType] || analysisPrompts.full_review}
-
-Repository: ${repo.repo_name}
+    const userPrompt = `Repository: ${repo.repo_name}
 Language: ${repo.language || "Mixed"}
 Files analyzed: ${files.length}
 
 ${codeContext}`;
 
-    // AI integration removed. Replace with your own code review logic or connect to your preferred AI provider.
-    return new Response(JSON.stringify({ message: "AI integration removed. Implement your own logic here." }), { headers: corsHeaders });
-  } catch (error) {
+    // Call NVIDIA AI with automatic model fallback
+    let result: { content: string; model: string; usage?: any };
+    try {
+      result = await callNVIDIA(SYSTEM_PROMPT, userPrompt, {
+        temperature: 0.2,
+        maxTokens: 4000,
+        expectedJson: true,
+      });
+    } catch (aiErr: any) {
+      await admin
+        .from("analysis_jobs")
+        .update({
+          status: "failed",
+          error_message: aiErr.message,
+          completed_at: new Date().toISOString(),
+        })
+        .eq("id", job.id);
+
+      await admin.from("error_events").insert({
+        function_name: "analyze-repo",
+        user_id: userId,
+        error_message: aiErr.message,
+        context: { repo_id: repoId },
+      });
+
+      return corsResponse(
+        { error: "AI analysis failed. Please try again later." },
+        { status: 502 },
+      );
+    }
+
+    // Parse JSON result from model
+    let parsed: any;
+    try {
+      parsed = extractJson(result.content);
+    } catch (parseErr) {
+      await admin
+        .from("analysis_jobs")
+        .update({
+          status: "failed",
+          error_message: `Failed to parse AI response: ${(parseErr as Error).message}`,
+          completed_at: new Date().toISOString(),
+        })
+        .eq("id", job.id);
+
+      return corsResponse(
+        { error: "AI response could not be parsed. Please try again." },
+        { status: 502 },
+      );
+    }
+
+    const analysis = toAnalysisResult(parsed);
+
+    // Save analysis report to database
+    const now = new Date().toISOString();
+    const { data: analysisRow, error: analysisError } = await admin
+      .from("analyses")
+      .insert({
+        repo_id: repoId,
+        user_id: userId,
+        quality_score: analysis.quality_score,
+        security_score: analysis.security_score,
+        performance_score: analysis.performance_score,
+        architecture_score: analysis.architecture_score,
+        report_json: analysis,
+        analysis_type: analysisType,
+        is_public: false,
+      })
+      .select()
+      .single();
+    if (analysisError) throw analysisError;
+
+    // Mark job complete
+    await admin
+      .from("analysis_jobs")
+      .update({
+        status: "completed",
+        model_used: result.model,
+        report_json: analysis,
+        completed_at: now,
+      })
+      .eq("id", job.id);
+
+    return corsResponse({
+      analysis: {
+        id: analysisRow.id,
+        ...analysis,
+        created_at: now,
+        repository: { repo_name: repo.repo_name, language: repo.language },
+      },
+      job_id: job.id,
+      model: result.model,
+    });
+  } catch (error: any) {
     console.error("analyze-repo error:", error);
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.stack || error.message : String(error) }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    try {
+      const userId = await getUserIdFromRequest(req).catch(() => null);
+      if (userId) {
+        const admin = serviceClient();
+        await admin.from("error_events").insert({
+          function_name: "analyze-repo",
+          user_id: userId,
+          error_message: error.message,
+          stack_trace: error.stack,
+        });
+      }
+    } catch {}
+    return corsResponse(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 });
