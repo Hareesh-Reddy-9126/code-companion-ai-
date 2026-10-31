@@ -52,52 +52,9 @@ export default function Repositories() {
     fetchRepos();
   }, [fetchRepos]);
 
-  // Handle GitHub OAuth callback
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    const error = params.get("error");
-    if (error) {
-      window.history.replaceState({}, "", "/repositories");
-      toast({ title: "GitHub authorization denied", description: params.get("error_description") || error, variant: "destructive" });
-      return;
-    }
-    if (code && !connecting) {
-      setConnecting(true);
-      window.history.replaceState({}, "", "/repositories");
-      handleGitHubCallback(code);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleGitHubCallback = async (code: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke("github-callback", {
-        body: { code },
-      });
-      if (error) {
-        // Try to extract message from FunctionsHttpError
-        let message = error.message;
-        try {
-          const body = JSON.parse(error.context?.body || "{}");
-          if (body.error) message = body.error;
-        } catch {}
-        throw new Error(message);
-      }
-      if (data?.error) throw new Error(data.error);
-      toast({ title: "GitHub connected!", description: `Synced ${data.repoCount} repositories` });
-      await refreshProfile();
-      await fetchRepos();
-    } catch (e: any) {
-      toast({ title: "GitHub connection failed", description: e.message, variant: "destructive" });
-    } finally {
-      setConnecting(false);
-    }
-  };
-
   const connectGitHub = async () => {
     try {
-      const redirectUri = `http://localhost:8080/auth/github/callback`;
+      const redirectUri = `${window.location.origin}/auth/github/callback`;
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/github-auth-url?redirect_uri=${encodeURIComponent(redirectUri)}`,
         {

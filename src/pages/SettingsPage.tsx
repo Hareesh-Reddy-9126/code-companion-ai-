@@ -36,10 +36,10 @@ export default function SettingsPage() {
   const disconnectGitHub = async () => {
     setDisconnecting(true);
     try {
-      await supabase.from("profiles").update({
-        github_username: null,
-        github_access_token: null,
-      }).eq("user_id", user!.id);
+      const { error } = await supabase.functions.invoke("revoke-github", {
+        body: {},
+      });
+      if (error) throw error;
       await refreshProfile();
       toast({ title: "GitHub disconnected" });
     } catch (e: any) {
@@ -92,7 +92,7 @@ export default function SettingsPage() {
               size="sm"
               onClick={async () => {
                 try {
-                  const redirectUri = `http://localhost:8080/auth/github/callback`;
+                  const redirectUri = `${window.location.origin}/auth/github/callback`;
                   const res = await fetch(
                     `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/github-auth-url?redirect_uri=${encodeURIComponent(redirectUri)}`,
                     { headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` } }

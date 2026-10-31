@@ -1,13 +1,19 @@
 project_id = "totmebhamyrmjbzkcogg"
 
 [functions.github-callback]
-verify_jwt = false
+verify_jwt = true
 
 [functions.analyze-repo]
-verify_jwt = false
+verify_jwt = true
 
 [functions.analyze-pr]
-verify_jwt = false
+verify_jwt = true
 
 [functions.github-auth-url]
 verify_jwt = false
+
+[functions.health]
+verify_jwt = false
+
+[functions.admin-stats]
+verify_jwt = true

@@ -1,9 +1,18 @@
 import { StatCard } from "@/components/StatCard";
 import { ScoreCard } from "@/components/ScoreCard";
-import { GitBranch, Shield, Zap, Code2, Clock, ArrowUpRight, Loader2 } from "lucide-react";
+import {
+  GitBranch, Shield, Zap, Code2, Clock, ArrowUpRight,
+  Loader2, TrendingUp, Activity, Users, Database, Lock,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from "@/components/ui/card";
 
 interface AnalysisWithRepo {
   id: string;
@@ -15,6 +24,8 @@ interface AnalysisWithRepo {
 }
 
 export default function Dashboard() {
+  const { profile, user } = useAuth();
+  const { toast } = useToast();
   const [analyses, setAnalyses] = useState<AnalysisWithRepo[]>([]);
   const [repoCount, setRepoCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -37,25 +48,12 @@ export default function Dashboard() {
     load();
   }, []);
 
-  // Calculate averages with clear variable names
   const avgQuality = analyses.length
-    ? Math.round(analyses.reduce((sum, analysis) => sum + (analysis.quality_score || 0), 0) / analyses.length)
+    ? Math.round(analyses.reduce((sum, a) => sum + (a.quality_score || 0), 0) / analyses.length)
     : 0;
   const avgSecurity = analyses.length
-    ? Math.round(analyses.reduce((sum, analysis) => sum + (analysis.security_score || 0), 0) / analyses.length)
+    ? Math.round(analyses.reduce((sum, a) => sum + (a.security_score || 0), 0) / analyses.length)
     : 0;
-  const avgPerf = analyses.length
-    ? Math.round(analyses.reduce((sum, analysis) => sum + (analysis.performance_score || 0), 0) / analyses.length)
-    : 0;
-
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    const diffMs = Date.now() - new Date(dateString).getTime();
-    const hours = Math.floor(diffMs / 3600000);
-    if (hours < 1) return "Just now";
-    if (hours < 24) return `${hours} hours ago`;
-    return `${Math.floor(hours / 24)} days ago`;
-  };
 
   if (loading) {
     return (
@@ -66,63 +64,85 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6 animate-slide-in">
-      <div>
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground text-sm mt-1">Overview of your code analysis</p>
+    <div className="space-y-8 animate-in">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground mt-1">
+            Overview of your code analysis platform
+          </p>
+        </div>
+        <Button onClick={() => navigate("/repositories")} className="enterprise-btn">
+          <Code2 className="w-4 h-4 mr-2" /> Analyze Repository
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard title="Repos Connected" value={repoCount} icon={GitBranch} change={`${analyses.length} analyzed`} />
         <StatCard title="Avg Quality Score" value={avgQuality} icon={Code2} change={analyses.length ? "Across all analyses" : "No analyses yet"} />
         <StatCard title="Security Score" value={avgSecurity} icon={Shield} change={analyses.length ? "Average" : "No data"} />
-        <StatCard title="Total Analyses" value={analyses.length} icon={Clock} change="All time" />
+        <StatCard title="Total Analyses" value={analyses.length} icon={Activity} change="All time" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <ScoreCard title="Code Quality" score={avgQuality} icon={Code2} subtitle="Across all repos" />
-        <ScoreCard title="Security" score={avgSecurity} icon={Shield} subtitle={`${analyses.length} scans`} />
-        <ScoreCard title="Performance" score={avgPerf} icon={Zap} subtitle="Average score" />
-      </div>
-
-      <div className="glass-card p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Recent Analyses</h2>
-          <button
-            onClick={() => navigate("/history")}
-            className="text-xs text-primary hover:underline flex items-center gap-1"
-          >
-            View all <ArrowUpRight className="h-3 w-3" />
-          </button>
-        </div>
-        {analyses.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">No analyses yet. Go to Repositories to analyze your first repo.</p>
-        ) : (
-          <div className="space-y-3">
-            {analyses.slice(0, 5).map((analysis) => (
-              <div
-                key={analysis.id}
-                onClick={() => navigate(`/code-review?analysisId=${analysis.id}`)}
-                className="flex items-center justify-between p-3 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <GitBranch className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">{(analysis.repositories as any)?.repo_name || "Unknown"}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {(analysis.repositories as any)?.language || "N/A"} · {formatDate(analysis.created_at)}
-                    </p>
-                  </div>
-                </div>
-                <div className={`text-sm font-bold ${(analysis.quality_score || 0) >= 80 ? "text-primary" : (analysis.quality_score || 0) >= 60 ? "text-warning" : "text-destructive"}`}>
-                  {analysis.quality_score || 0}/100
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="enterprise-card">
+          <CardHeader>
+            <CardTitle>Recent Analyses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {analyses.length === 0 ? (
+              <div className="text-center py-12">
+                <Database className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">No analyses yet</h3>
+                <p className="text-sm text-muted-foreground mb-6">Analyze your first repository to see results here.</p>
+                <Button className="enterprise-btn w-full" onClick={() => navigate("/repositories")}>
+                  Analyze Repository
+                </Button>
               </div>
-            ))}
-          </div>
-        )}
+            ) : (
+              <div className="space-y-4">
+                {analyses.slice(0, 5).map((analysis) => (
+                  <div key={analysis.id} className="flex items-center justify-between p-4 rounded-xl bg-muted/50 border border-border/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+                        <GitBranch className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{analysis.repositories?.repo_name || "Unknown"}</p>
+                        <p className="text-xs text-muted-foreground">{analysis.repositories?.language || "N/A"}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-primary">{analysis.quality_score || 0}/100</div>
+                      <div className="text-xs text-muted-foreground">Quality</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="enterprise-card lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              Quality Trends
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-64 w-full">
+              <div className="flex items-end h-full gap-2 px-4 py-6">
+                {analyses.slice().reverse().map((a, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-end justify-end gap-1">
+                    <div className="w-full rounded-t-lg bg-primary/20" style={{ height: `${Math.max(20, (a.quality_score || 0))}%` }} />
+                    <span className="text-[10px] text-muted-foreground">{Math.max(20, (a.quality_score || 0))}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
