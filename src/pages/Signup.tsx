@@ -21,10 +21,13 @@ export default function Signup() {
       return;
     }
     setLoading(true);
-    const { error } = await signUp(email, password, name);
+    const { error, session } = await signUp(email, password, name);
     setLoading(false);
     if (error) {
       toast({ title: "Signup failed", description: error.message, variant: "destructive" });
+    } else if (session) {
+      toast({ title: "Account created!", description: "Welcome to Code Companion AI." });
+      navigate("/dashboard");
     } else {
       toast({ title: "Account created!", description: "Check your email to confirm your account." });
       navigate("/login");

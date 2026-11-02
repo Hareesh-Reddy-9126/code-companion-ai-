@@ -86,12 +86,13 @@ export default function Features() {
             <div className="enterprise-card p-8">
               <h3 className="text-xl font-bold text-foreground mb-4">Security First</h3>
               <p className="text-muted-foreground text-sm mb-4">
-                AES-256-GCM encryption for stored tokens, SOC2 compliance, and RLS for data isolation.
+                AES-256-GCM encryption for stored tokens, row-level security for data isolation,
+                and SOC 2 aligned controls. Certification is in progress.
                 Your code never leaves your control.
               </p>
               <div className="flex items-center gap-3">
                 <ShieldCheck className="w-5 h-5 text-blue-600" />
-                <span className="text-sm font-medium text-foreground">SOC2 Type II Ready</span>
+                <span className="text-sm font-medium text-foreground">SOC 2 aligned</span>
               </div>
             </div>
           </div>
@@ -104,11 +105,11 @@ export default function Features() {
             Start Analyzing Code Today
           </h2>
           <p className="text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Join engineering teams shipping secure, high-quality code with Code Companion AI.
+            Start analyzing your repositories with a free account.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button className="enterprise-btn text-base px-8 py-4" asChild>
-              <Link to="/signup">Start Free Trial</Link>
+              <Link to="/signup">Start free</Link>
             </Button>
             <Button className="enterprise-btn-outline text-base px-8 py-4" asChild>
               <Link to="/docs">View Documentation</Link>
