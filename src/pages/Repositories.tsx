@@ -69,7 +69,9 @@ export default function Repositories() {
         toast({ title: "GitHub not configured", description: authData.error, variant: "destructive" });
         return;
       }
-      window.location.href = `https://github.com/login/oauth/authorize?client_id=${authData.client_id}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo`;
+      const state = crypto.randomUUID();
+      sessionStorage.setItem("github_oauth_state", state);
+      window.location.href = `https://github.com/login/oauth/authorize?client_id=${authData.client_id}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo&state=${state}`;
     } catch (e: any) {
       toast({ title: "Error", description: e.message, variant: "destructive" });
     }
