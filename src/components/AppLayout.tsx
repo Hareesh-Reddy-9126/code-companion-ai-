@@ -1,13 +1,13 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Outlet } from "react-router-dom";
-import { Bell, Search, LogOut } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export function AppLayout() {
-  const { profile, signOut } = useAuth();
+  const { profile, user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -15,9 +15,13 @@ export function AppLayout() {
     navigate("/login");
   };
 
-  const initials = profile?.name
-    ? profile.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
-    : "??";
+  const initials = (profile?.name || user?.email || "?")
+    .split(/[\s@]+/)
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <SidebarProvider>
@@ -27,11 +31,6 @@ export function AppLayout() {
           <header className="h-14 flex items-center justify-between border-b border-border/50 px-4 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
             <div className="flex items-center gap-3">
               <SidebarTrigger />
-              <div className="hidden sm:flex items-center gap-2 bg-secondary/50 rounded-lg px-3 py-1.5 text-sm text-muted-foreground">
-                <Search className="h-3.5 w-3.5" />
-                <span>Search...</span>
-                <kbd className="ml-4 text-xs bg-muted px-1.5 py-0.5 rounded">⌘K</kbd>
-              </div>
             </div>
             <div className="flex items-center gap-3">
               <button className="p-2 rounded-lg hover:bg-secondary/50 transition-colors text-muted-foreground hover:text-foreground">

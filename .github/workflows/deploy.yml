@@ -5,8 +5,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: production
+  cancel-in-progress: false
+
 jobs:
-  deploy-frontend:
+  verify:
+    name: Verify build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,50 +25,44 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
       - name: Build
         run: npm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: code-companion-ai
-          directory: dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-
   deploy-functions:
+    name: Deploy edge functions
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Supabase CLI
-        run: |
-          npm install -g supabase@latest
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
 
-      - name: Deploy Edge Functions
-        run: |
-          supabase functions deploy analyze-repo
-          supabase functions deploy analyze-pr
-          supabase functions deploy github-callback
-          supabase functions deploy github-auth-url
-          supabase functions deploy health
-          supabase functions deploy admin-stats
-          supabase functions deploy revoke-github
+      - name: Deploy Supabase functions
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-
-  keep-alive:
-    runs-on: ubuntu-latest
-    schedule:
-      - cron: "0 */6 * * *" # every 6 hours to prevent Supabase free pause
-    steps:
-      - name: Keep Supabase project awake
         run: |
-          curl -s ${{ secrets.VITE_SUPABASE_URL }}/rest/v1/profiles?select=count \
-            -H "apikey: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}" > /dev/null || true
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "::warning::SUPABASE_ACCESS_TOKEN is not configured; skipping function deployment."
+            exit 0
+          fi
+          REF="${SUPABASE_PROJECT_REF:-gcszjbtdofquemrbumvg}"
+          for fn in health analyze-repo analyze-pr github-auth-url github-callback admin-stats revoke-github autonomous-fix; do
+            echo "Deploying $fn"
+            npx supabase functions deploy "$fn" --project-ref "$REF"
+          done

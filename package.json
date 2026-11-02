@@ -11,7 +11,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "deploy:functions": "supabase functions deploy analyze-repo && supabase functions deploy analyze-pr && supabase functions deploy github-callback && supabase functions deploy github-auth-url && supabase functions deploy health && supabase functions deploy admin-stats && supabase functions deploy revoke-github",
+    "deploy:functions": "supabase functions deploy --project-ref gcszjbtdofquemrbumvg",
+    "deploy": "npm run build && npx wrangler deploy",
+    "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

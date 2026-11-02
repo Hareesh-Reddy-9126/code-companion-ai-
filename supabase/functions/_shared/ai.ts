@@ -7,7 +7,9 @@ import {
 } from "./env.ts";
 
 const MODELS = [PRIMARY_MODEL, FALLBACK_MODEL_1, FALLBACK_MODEL_2];
-const REQUEST_TIMEOUT_MS = 110_000; // under Supabase 150s wall clock
+// Per-model budget keeps the whole call inside Supabase's 150s wall clock.
+const REQUEST_TIMEOUT_MS = 45_000;
+const TOTAL_BUDGET_MS = 130_000;
 
 export interface AnalysisResult {
   quality_score: number;
@@ -53,13 +55,15 @@ export async function callNVIDIA(
   } = opts;
 
   const lastErrors: NVIDIAError[] = [];
+  const startedAt = Date.now();
 
   for (const model of MODELS) {
+    if (Date.now() - startedAt > TOTAL_BUDGET_MS) break;
     try {
       const controller = new AbortController();
       const timeout = setTimeout(
         () => controller.abort(),
-        REQUEST_TIMEOUT_MS,
+        Math.min(REQUEST_TIMEOUT_MS, TOTAL_BUDGET_MS - (Date.now() - startedAt)),
       );
 
       const res = await fetch(`${NVIDIA_BASE_URL}/chat/completions`, {
@@ -96,7 +100,10 @@ export async function callNVIDIA(
       }
 
       const data = await res.json();
-      const content = data.choices?.[0]?.message?.content ?? "";
+      const message = data.choices?.[0]?.message ?? {};
+      // Reasoning models may return only `reasoning_content` when the token
+      // budget is consumed before the final answer.
+      const content: string = message.content ?? message.reasoning_content ?? "";
 
       if (!content) {
         const err = new Error(
@@ -144,7 +151,7 @@ export function extractJson(content: string): any {
   } catch {}
 
   // Try to find a JSON block inside markdown fences
-  const fenceMatch = content.match(/```json\n([\s\S]*?)\n```/);
+  const fenceMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/i);
   if (fenceMatch) {
     try {
       return JSON.parse(fenceMatch[1]);

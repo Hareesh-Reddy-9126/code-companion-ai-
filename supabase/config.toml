@@ -1,4 +1,4 @@
-project_id = "totmebhamyrmjbzkcogg"
+project_id = "gcszjbtdofquemrbumvg"
 
 [functions.github-callback]
 verify_jwt = true
@@ -19,4 +19,7 @@ verify_jwt = false
 verify_jwt = true
 
 [functions.autonomous-fix]
+verify_jwt = true
+
+[functions.revoke-github]
 verify_jwt = true

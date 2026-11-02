@@ -75,6 +75,7 @@ serve(async (req) => {
       .insert({
         user_id: userId,
         repo_id,
+        repo_name: repo.repo_name,
         pr_number,
         status: "analyzing",
         confidence_score: 0,
@@ -109,6 +110,8 @@ serve(async (req) => {
       .from("autonomous_fixes")
       .update({
         status: "fixing",
+        pr_title: pr.title,
+        summary: parsed.summary,
         issues_found: fixes.length,
         fixes_applied: highConfidenceFixes.length,
         confidence_score: Math.round(
@@ -141,6 +144,7 @@ serve(async (req) => {
       .from("autonomous_fixes")
       .update({
         status: "completed",
+        report_json: parsed,
         completed_at: new Date().toISOString(),
       })
       .eq("id", fixRecord.id);

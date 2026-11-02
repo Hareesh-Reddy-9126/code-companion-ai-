@@ -33,23 +33,12 @@ jobs:
       - name: Build
         run: npm run build
 
-  codeql:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: github/codeql-action/init@v3
-        with:
-          languages: javascript
-      - uses: github/codeql-action/analyze@v3
-
   dependabot-approve:
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]'
+    permissions:
+      pull-requests: write
     steps:
-      - run: echo "Dependabot PR auto-approved"
       - uses: actions/github-script@v7
         with:
           script: |

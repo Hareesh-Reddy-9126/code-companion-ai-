@@ -1,281 +1,226 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  CreditCard, Activity, BarChart3, Clock, TrendingUp,
-  AlertCircle, CheckCircle2, DollarSign, Users,
+  CreditCard, Activity, BarChart3, CheckCircle2, Zap, ShieldCheck,
 } from "lucide-react";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import {
-  Card, CardContent, CardHeader, CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
-interface BillingPlan {
-  name: string;
-  price: number;
-  interval: "month" | "year";
-  features: string[];
-  limits: {
-    repos: number;
-    analyses: number;
-    team_members: number;
-  };
+interface Usage {
+  repositories: number;
+  analyses: number;
+  issues: number;
 }
 
-interface Invoice {
-  id: string;
-  amount: number;
-  status: "paid" | "pending" | "overdue";
-  date: string;
-  description: string;
-}
-
-const plans: BillingPlan[] = [
+const plans = [
   {
-    name: "Starter",
-    price: 0,
-    interval: "month",
-    features: ["5 repositories", "Basic AI analysis", "Community support"],
-    limits: { repos: 5, analyses: 100, team_members: 1 },
+    name: "Free",
+    price: "$0",
+    description: "For individual developers getting started.",
+    features: ["5 repositories", "10 AI analyses per day", "Security scanning", "Community support"],
+    current: true,
   },
   {
     name: "Professional",
-    price: 49,
-    interval: "month",
-    features: ["50 repositories", "Nemotron 3 Ultra AI", "PR review comments", "Team workspaces", "Priority support"],
-    limits: { repos: 50, analyses: 5000, team_members: 10 },
+    price: "$49",
+    description: "For teams shipping to production every day.",
+    features: ["50 repositories", "5,000 analyses per month", "PR comments", "Team workspaces", "Priority support"],
+    current: false,
   },
   {
     name: "Enterprise",
-    price: 499,
-    interval: "month",
-    features: ["Unlimited repositories", "Custom AI models", "SOC2 Type II", "SAML SSO", "Dedicated SRE", "24/7 support", "API access"],
-    limits: { repos: -1, analyses: -1, team_members: -1 },
+    price: "Custom",
+    description: "For organizations with compliance requirements.",
+    features: ["Unlimited repositories", "SAML SSO", "Data residency", "Self-hosted option", "Dedicated support"],
+    current: false,
   },
 ];
 
-const invoices: Invoice[] = [
-  { id: "INV-001", amount: 499, status: "paid", date: "2026-10-01", description: "Enterprise Plan - October 2026" },
-  { id: "INV-002", amount: 499, status: "paid", date: "2026-09-01", description: "Enterprise Plan - September 2026" },
-  { id: "INV-003", amount: 499, status: "pending", date: "2026-11-01", description: "Enterprise Plan - November 2026" },
-];
+const FREE_DAILY_LIMIT = 10;
 
 export default function Billing() {
-  const [plan, setPlan] = useState("enterprise");
-  const [paymentMethod, setPaymentMethod] = useState("");
   const { toast } = useToast();
+  const [usage, setUsage] = useState<Usage>({ repositories: 0, analyses: 0, issues: 0 });
+  const [analysesToday, setAnalysesToday] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  const currentPlan = plans.find((p) => p.name.toLowerCase() === plan);
+  useEffect(() => {
+    const load = async () => {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const [repos, analyses, today, latest] = await Promise.all([
+        supabase.from("repositories").select("id", { count: "exact", head: true }),
+        supabase.from("analyses").select("id", { count: "exact", head: true }),
+        supabase
+          .from("analysis_jobs")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", startOfDay.toISOString()),
+        supabase
+          .from("analyses")
+          .select("security_score")
+          .order("created_at", { ascending: false })
+          .limit(20),
+      ]);
+      setUsage({
+        repositories: repos.count ?? 0,
+        analyses: analyses.count ?? 0,
+        issues: latest.data?.filter((a) => (a.security_score ?? 100) < 80).length ?? 0,
+      });
+      setAnalysesToday(today.count ?? 0);
+      setLoading(false);
+    };
+    load();
+  }, []);
 
-  const handleUpgrade = async (p: BillingPlan) => {
+  const upgrade = (plan: string) => {
     toast({
-      title: "Plan Updated",
-      description: `Successfully upgraded to ${p.name} plan`,
+      title: `${plan} plan`,
+      description:
+        plan === "Enterprise"
+          ? "Email sales@codecompanion.ai for a scoped enterprise agreement."
+          : "Paid plans are rolling out. Contact sales to join the early access list.",
     });
   };
 
-  const addPaymentMethod = async () => {
-    if (!paymentMethod) {
-      toast({ title: "Error", description: "Enter payment method details", variant: "destructive" });
-      return;
-    }
-    toast({ title: "Payment Method Added", description: "Securely stored for future billing" });
-  };
+  const pct = Math.min(100, Math.round((analysesToday / FREE_DAILY_LIMIT) * 100));
 
   return (
     <div className="space-y-8 animate-in">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Billing & Subscription</h1>
+          <h1 className="text-2xl font-bold text-foreground">Billing &amp; usage</h1>
           <p className="text-muted-foreground mt-1">
-            Manage your plan, payment methods, and invoices
+            Track your plan, usage and limits
           </p>
         </div>
-        <Button variant="outline">
-          <DollarSign className="w-4 h-4 mr-2" /> Download Tax Receipts
+        <Button variant="outline" asChild>
+          <Link to="/pricing">Compare plans</Link>
         </Button>
       </div>
 
-      {/* Current Plan */}
-      <div className="enterprise-card">
+      <Card className="enterprise-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5" /> Current Plan
+            <CreditCard className="w-5 h-5" /> Current plan
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-lg font-medium text-foreground">{currentPlan?.name}</h3>
-              <p className="text-sm text-muted-foreground">${currentPlan?.price}/month</p>
+              <h3 className="text-lg font-medium text-foreground">Free (beta)</h3>
+              <p className="text-sm text-muted-foreground">$0 / month · No card required</p>
             </div>
-            <Badge variant={currentPlan?.name === "Enterprise" ? "primary" : "secondary"}>
-              {currentPlan?.name}
-            </Badge>
+            <Badge>Active</Badge>
           </div>
-          <div className="grid grid-cols-3 gap-4 text-center pt-4 border-t border-border/50">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 mt-6 border-t border-border/50 text-center">
             <div>
-              <p className="text-xs font-bold text-foreground">{currentPlan?.limits.repos === -1 ? "∞" : currentPlan?.limits.repos}</p>
+              <p className="text-2xl font-bold text-foreground">{loading ? "-" : usage.repositories}</p>
               <p className="text-xs text-muted-foreground">Repositories</p>
             </div>
             <div>
-              <p className="text-xs font-bold text-foreground">{currentPlan?.limits.analyses === -1 ? "∞" : currentPlan?.limits.analyses}</p>
-              <p className="text-xs text-muted-foreground">AI Analyses/mo</p>
+              <p className="text-2xl font-bold text-foreground">{loading ? "-" : usage.analyses}</p>
+              <p className="text-xs text-muted-foreground">Total analyses</p>
             </div>
             <div>
-              <p className="text-xs font-bold text-foreground">{currentPlan?.limits.team_members === -1 ? "∞" : currentPlan?.limits.team_members}</p>
-              <p className="text-xs text-muted-foreground">Team Members</p>
+              <p className="text-2xl font-bold text-foreground">{loading ? "-" : usage.issues}</p>
+              <p className="text-xs text-muted-foreground">Open risk signals</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-foreground">{loading ? "-" : `${analysesToday}/${FREE_DAILY_LIMIT}`}</p>
+              <p className="text-xs text-muted-foreground">Analyses today</p>
+            </div>
+          </div>
+          <div className="mt-6">
+            <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+              <span>Daily analysis quota</span>
+              <span>{pct}% used</span>
+            </div>
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div
+                className={`h-full rounded-full ${pct >= 90 ? "bg-destructive" : "bg-primary"}`}
+                style={{ width: `${pct}%` }}
+              />
             </div>
           </div>
         </CardContent>
-      </div>
+      </Card>
 
-      {/* Plan Selection */}
       <div className="grid md:grid-cols-3 gap-6">
-        {plans.map((p) => (
-          <Card key={p.name} className={`enterprise-card ${plan === p.name.toLowerCase() ? "ring-2 ring-blue-500" : "hover:border-primary/30 cursor-pointer"}`}>
+        {plans.map((plan) => (
+          <Card key={plan.name} className={`enterprise-card ${plan.current ? "ring-2 ring-primary" : ""}`}>
             <CardHeader>
-              <CardTitle>{p.name}</CardTitle>
-              <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-foreground">${p.price}</span>
-                <span className="text-sm text-muted-foreground">/month</span>
+              <div className="flex items-center justify-between">
+                <CardTitle>{plan.name}</CardTitle>
+                {plan.current && <Badge>Current</Badge>}
               </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-bold text-foreground">{plan.price}</span>
+                {plan.price.startsWith("$") && plan.price !== "$0" && (
+                  <span className="text-sm text-muted-foreground">/month</span>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">{plan.description}</p>
             </CardHeader>
             <CardContent>
               <ul className="space-y-3 mb-6">
-                {p.features.map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-sm">
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-start gap-3 text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
                     <span className="text-foreground">{f}</span>
                   </li>
                 ))}
               </ul>
               <Button
-                onClick={() => handleUpgrade(p)}
-                className={`w-full ${plan === p.name.toLowerCase() ? "enterprise-btn" : "enterprise-btn-outline"}`}
+                className="w-full"
+                variant={plan.current ? "outline" : "default"}
+                disabled={plan.current}
+                onClick={() => upgrade(plan.name)}
               >
-                {plan === p.name.toLowerCase() ? "Current Plan" : "Select Plan"}
+                {plan.current ? "Current plan" : plan.name === "Enterprise" ? "Contact sales" : "Join early access"}
               </Button>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Payment Method */}
-      <div className="enterprise-card">
+      <Card className="enterprise-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Lock className="w-5 h-5" /> Payment Method
+            <Activity className="w-5 h-5" /> Payment method
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium text-foreground">Payment Method</h3>
-                <p className="text-sm text-muted-foreground">Securely stored with Stripe</p>
-              </div>
-              <Badge variant={paymentMethod ? "default" : "destructive"}>
-                {paymentMethod ? "Active" : "Not configured"}
-              </Badge>
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
+              <ShieldCheck className="w-5 h-5 text-muted-foreground" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                placeholder="Card number"
-                className="enterprise-input"
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              />
-              <Input placeholder="MM/YY" className="enterprise-input max-w-xs" />
-              <Input placeholder="CVC" className="enterprise-input max-w-xs" />
+            <div>
+              <p className="text-sm font-medium text-foreground">No payment method on file</p>
+              <p className="text-sm text-muted-foreground">
+                Paid plans will be billed securely through Stripe. This app never
+                stores card details.
+              </p>
             </div>
-            <Button onClick={addPaymentMethod} disabled={!paymentMethod}>
-              Save Payment Method
-            </Button>
           </div>
         </CardContent>
-      </div>
+      </Card>
 
-      {/* Invoices */}
-      <div className="enterprise-card">
+      <Card className="enterprise-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Activity className="w-5 h-5" /> Recent Invoices
+            <BarChart3 className="w-5 h-5" /> Invoices
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left border-b border-border/50">
-                  <th className="pb-3 text-muted-foreground font-medium">Invoice ID</th>
-                  <th className="pb-3 text-muted-foreground font-medium">Amount</th>
-                  <th className="pb-3 text-muted-foreground font-medium">Status</th>
-                  <th className="pb-3 text-muted-foreground font-medium">Date</th>
-                  <th className="pb-3 text-muted-foreground font-medium">Description</th>
-                  <th className="pb-3 text-muted-foreground font-medium"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoices.map((inv) => (
-                  <tr key={inv.id} className="border-b border-border/50">
-                    <td className="py-3 font-medium text-foreground">#{inv.id}</td>
-                    <td className="py-3 text-foreground">${inv.amount}</td>
-                    <td className="py-3">
-                      <Badge variant={inv.status === "paid" ? "default" : inv.status === "pending" ? "secondary" : "destructive"}>
-                        {inv.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3 text-muted-foreground">{inv.date}</td>
-                    <td className="py-3 text-muted-foreground">{inv.description}</td>
-                    <td className="py-3">
-                      <Button variant="outline" size="sm">Download</Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="flex items-center gap-3 py-6 text-sm text-muted-foreground">
+            <Zap className="w-4 h-4" />
+            No invoices yet. You are on the free beta.
           </div>
         </CardContent>
-      </div>
-
-      {/* Usage Analytics */}
-      <div className="enterprise-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="w-5 h-5" /> Usage Analytics
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-3 gap-6">
-            <div className="p-4 rounded-xl bg-muted/50 border border-border/50">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">AI Analyses</p>
-              <p className="text-2xl font-bold text-foreground">340</p>
-              <div className="flex items-center gap-1 mt-2">
-                <TrendingUp className="w-3 h-3 text-green-600" />
-                <span className="text-xs text-green-600 font-medium">+12% vs last month</span>
-              </div>
-            </div>
-            <div className="p-4 rounded-xl bg-muted/50 border border-border/50">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">Repos Connected</p>
-              <p className="text-2xl font-bold text-foreground">12</p>
-              <div className="flex items-center gap-1 mt-2">
-                <Clock className="w-3 h-3 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Updated 2h ago</span>
-              </div>
-            </div>
-            <div className="p-4 rounded-xl bg-muted/50 border border-border/50">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">Estimated Cost</p>
-              <p className="text-2xl font-bold text-foreground">$499</p>
-              <div className="flex items-center gap-1 mt-2">
-                <AlertCircle className="w-3 h-3 text-amber-600" />
-                <span className="text-xs text-amber-600 font-medium">Within budget</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </div>
+      </Card>
     </div>
   );
 }

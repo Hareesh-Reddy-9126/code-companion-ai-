@@ -9,6 +9,8 @@ import {
   Clock,
   Settings,
   Bot,
+  Users,
+  CreditCard,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -24,14 +26,17 @@ import {
 } from "@/components/ui/sidebar";
 
 const navItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Repositories", url: "/repositories", icon: GitBranch },
   { title: "AI Code Review", url: "/code-review", icon: Code2 },
   { title: "Pull Requests", url: "/pull-requests", icon: GitPullRequest },
   { title: "Security Scanner", url: "/security", icon: Shield },
   { title: "Performance", url: "/performance", icon: Zap },
   { title: "Architecture", url: "/architecture", icon: Boxes },
+  { title: "AI Agent", url: "/autonomous-agent", icon: Bot },
   { title: "History", url: "/history", icon: Clock },
+  { title: "Workspace", url: "/organization", icon: Users },
+  { title: "Billing", url: "/billing", icon: CreditCard },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
@@ -47,7 +52,7 @@ export function AppSidebar() {
           <Bot className="h-7 w-7 text-primary shrink-0" />
           {!collapsed && (
             <span className="text-lg font-bold tracking-tight text-foreground">
-              Code<span className="text-primary">Insight</span>
+              Code<span className="text-primary">Companion</span>
             </span>
           )}
         </div>
@@ -59,7 +64,7 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      end={item.url === "/"}
+                      end={item.url === "/dashboard"}
                       className="hover:bg-sidebar-accent/60 transition-colors"
                       activeClassName="bg-sidebar-accent text-primary font-medium"
                     >

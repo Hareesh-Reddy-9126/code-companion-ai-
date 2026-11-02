@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -23,32 +22,32 @@ const featureGrid = [
   {
     icon: Cpu,
     title: "AI-Powered Code Analysis",
-    desc: "Enterprise-grade LLM analysis using Nemotron models with 1M token context window.",
+    desc: "Deep review with NVIDIA Nemotron models and automatic fallback for reliable results.",
   },
   {
     icon: ShieldCheck,
-    title: "Bank-Level Security",
-    desc: "AES-256-GCM encryption, SOC2 compliance, and Row Level Security for your data.",
+    title: "Enterprise-grade Security",
+    desc: "AES-256-GCM token encryption and row-level security. SOC 2 aligned controls.",
   },
   {
     icon: Zap,
-    title: "Real-Time Monitoring",
-    desc: "Live analysis progress, instant alerts, and WebSocket-powered dashboards.",
+    title: "Live Analysis Tracking",
+    desc: "Follow every analysis job from queued to complete with instant results.",
   },
   {
     icon: Layers,
-    title: "Multi-Org Workspaces",
-    desc: "Team collaboration with role-based access control and workspace isolation.",
+    title: "Workspace Ready",
+    desc: "Per-user isolation today, with team workspaces and RBAC on the enterprise roadmap.",
   },
   {
     icon: Code2,
     title: "GitHub Integration",
-    desc: "Seamless OAuth connection, automatic repo syncing, and PR review comments.",
+    desc: "OAuth connection, automatic repository sync and pull request fix comments.",
   },
   {
     icon: BarChart3,
     title: "Executive Dashboards",
-    desc: "Security scores, quality metrics, and architecture health for leadership.",
+    desc: "Security scores, quality trends and architecture health for leadership.",
   },
 ];
 
@@ -57,33 +56,31 @@ const pricingPlans = [
     name: "Starter",
     price: "$0",
     description: "For individual developers",
-    features: ["5 repos/month", "Basic AI analysis", "Community support", "Public reports"],
+    features: ["5 repositories", "10 AI analyses per day", "Security scanning", "Community support"],
     highlighted: false,
   },
   {
     name: "Professional",
     price: "$49",
     description: "For growing teams",
-    features: ["50 repos/month", "Advanced AI analysis", "PR review comments", "Priority email support", "Team workspaces"],
+    features: ["50 repositories", "5,000 analyses per month", "PR review comments", "Priority support", "Team workspaces"],
     highlighted: true,
   },
   {
     name: "Enterprise",
-    price: "$499",
-    description: "For tech giants",
-    features: ["Unlimited repos", "Custom AI models", "SOC2 compliance", "Dedicated SRE", "White-label", "24/7 phone support", "API access"],
+    price: "Custom",
+    description: "For organizations with compliance needs",
+    features: ["Unlimited repositories", "Custom AI models", "SOC 2 aligned controls", "Data residency", "Self-hosted option", "Priority support", "API access"],
     highlighted: false,
   },
 ];
 
 export default function Landing() {
-  const [email, setEmail] = useState("");
-
   const heroStats = [
-    { label: "Repos Analyzed", value: "10K+" },
-    { label: "Security Issues Found", value: "50K+" },
-    { label: "Avg. Analysis Time", value: "< 30s" },
-    { label: "Uptime SLA", value: "99.9%" },
+    { label: "Primary model", value: "Nemotron 3" },
+    { label: "Token encryption", value: "AES-256" },
+    { label: "Data region", value: "EU" },
+    { label: "Free tier", value: "$0" },
   ];
 
   return (
@@ -113,12 +110,14 @@ export default function Landing() {
             <Link to="/docs" className="text-sm font-medium text-muted-foreground hover:text-blue-600 transition-colors">Docs</Link>
             <Link to="/enterprise" className="text-sm font-medium text-muted-foreground hover:text-blue-600 transition-colors">Enterprise</Link>
             <Link to="/login" className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">Login</Link>
-            <Button className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25">
-              Start Free Trial
+            <Button className="bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/25" asChild>
+              <Link to="/signup">Start Free</Link>
             </Button>
           </div>
           <div className="md:hidden">
-            <Button variant="outline">Sign in</Button>
+            <Button variant="outline" asChild>
+              <Link to="/login">Sign in</Link>
+            </Button>
           </div>
         </div>
       </nav>
@@ -128,7 +127,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-8">
             <span className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-400">
-              <CheckCircle2 className="w-3 h-3 mr-1.5" /> SOC2 Type II
+              <CheckCircle2 className="w-3 h-3 mr-1.5" /> SOC 2 aligned
             </span>
             <span className="inline-flex items-center rounded-full border border-purple-100 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 dark:bg-purple-900/30 dark:border-purple-800 dark:text-purple-400">
               <ShieldCheck className="w-3 h-3 mr-1.5" /> Enterprise Ready
@@ -141,7 +140,7 @@ export default function Landing() {
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto text-balance">
             Automated code review, security scanning, and architecture analysis for engineering teams.
-            Built for tech giants, priced for everyone.
+            Autonomous PR fixes, transparent scoring, and a free tier to start today.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
@@ -200,7 +199,7 @@ export default function Landing() {
               Simple, Transparent Pricing
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Choose the plan that fits your team. Upgrade anytime.
+              Start free today. Paid plans are in early access; enterprise agreements are scoped with our team.
             </p>
           </div>
 
@@ -218,7 +217,9 @@ export default function Landing() {
                   </h3>
                   <div className="flex items-baseline gap-1 mt-2">
                     <span className="text-4xl font-extrabold text-foreground">{plan.price}</span>
-                    <span className="text-sm text-muted-foreground">/month</span>
+                    {plan.price.startsWith("$") && plan.price !== "$0" && (
+                      <span className="text-sm text-muted-foreground">/month</span>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
                 </div>
@@ -231,10 +232,13 @@ export default function Landing() {
                   ))}
                 </ul>
                 <Button
+                  asChild
                   className={`w-full py-3 ${plan.highlighted ? "enterprise-btn" : "enterprise-btn-outline"}`}
                   key={plan.name}
                 >
-                  {plan.highlighted ? "Start Free Trial" : "Get Started"}
+                  <Link to={plan.name === "Enterprise" ? "/enterprise" : "/signup"}>
+                    {plan.name === "Enterprise" ? "Contact sales" : "Start free"}
+                  </Link>
                 </Button>
               </div>
             ))}
@@ -251,20 +255,15 @@ export default function Landing() {
               Ready to Ship Better Code?
             </h2>
             <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-              Join hundreds of engineering teams using Code Companion AI to ship secure,
-              high-quality code faster.
+              Start reviewing your first repository in minutes with a free account.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <div className="relative w-full sm:w-96">
-                <input
-                  type="email"
-                  placeholder="Enter your work email"
-                  className="enterprise-input w-full"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <Button className="enterprise-btn w-full sm:w-auto">Get Started</Button>
+              <Button className="enterprise-btn w-full sm:w-auto" asChild>
+                <Link to="/signup">Get started free</Link>
+              </Button>
+              <Button className="enterprise-btn-outline w-full sm:w-auto" asChild>
+                <Link to="/enterprise">Talk to sales</Link>
+              </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-4">
               No credit card required. Cancel anytime.
@@ -293,15 +292,29 @@ export default function Landing() {
               <Link to="/enterprise" className="hover:text-blue-600 transition-colors">Enterprise</Link>
             </div>
             <div className="flex gap-4">
-              <a href="#" className="text-muted-foreground hover:text-blue-600 transition-colors">
+              <a
+                href="https://github.com/Hareesh-Reddy-9126/code-companion-ai-"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="GitHub repository"
+                className="text-muted-foreground hover:text-blue-600 transition-colors"
+              >
                 <Globe className="w-5 h-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-blue-600 transition-colors">
+              <a
+                href="mailto:support@codecompanion.ai"
+                aria-label="Email support"
+                className="text-muted-foreground hover:text-blue-600 transition-colors"
+              >
                 <Mail className="w-5 h-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-blue-600 transition-colors">
+              <Link
+                to="/security-policy"
+                aria-label="Security policy"
+                className="text-muted-foreground hover:text-blue-600 transition-colors"
+              >
                 <Lock className="w-5 h-5" />
-              </a>
+              </Link>
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-8 text-center">

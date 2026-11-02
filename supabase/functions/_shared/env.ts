@@ -16,7 +16,8 @@ export const FALLBACK_MODEL_1 =
   Deno.env.get("NVIDIA_FALLBACK_MODEL_1") ??
   "nvidia/nemotron-3.5-lightning-30b-a3b";
 export const FALLBACK_MODEL_2 =
-  Deno.env.get("NVIDIA_FALLBACK_MODEL_2") ?? "openai/gpt-oss-120b";
+  Deno.env.get("NVIDIA_FALLBACK_MODEL_2") ??
+  "nvidia/llama-3.1-nemotron-70b-instruct";
 
 export function requireEnv(...names: string[]): void {
   const missing = names.filter((n) => !Deno.env.get(n));
