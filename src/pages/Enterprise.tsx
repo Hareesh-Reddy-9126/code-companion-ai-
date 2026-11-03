@@ -1,4 +1,4 @@
-ï»¿import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -133,7 +133,7 @@ export default function Enterprise() {
                 </Button>
               </div>
               <p className="mt-4 font-mono text-[9.5px] uppercase tracking-[0.13em] text-muted-foreground/60">
-                Design-partner conversations open Â· No certification claimed
+                Design-partner conversations open · No certification claimed
               </p>
             </Reveal>
 
@@ -231,7 +231,7 @@ export default function Enterprise() {
             </div>
             <p className="max-w-[40ch] text-[13px] leading-6 text-muted-foreground">
               Roadmap items are directional. If your evaluation depends on one,
-              tell us â€” it moves the priority list.
+              tell us — it moves the priority list.
             </p>
           </Reveal>
 
@@ -312,7 +312,7 @@ export default function Enterprise() {
             </Reveal>
 
             <Reveal delay={100}>
-              <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-[linear-gradient(180deg,hsl(var(--primary)/0.06),hsl(var(--card))_38%)] p-7 sm:p-9">
+              <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-[linear-gradient(180deg,hsl(var(--brand)/0.06),hsl(var(--card))_38%)] p-7 sm:p-9">
                 <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-primary/[0.07] blur-3xl" />
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
                   <Mail className="h-5 w-5" />
@@ -401,3 +401,4 @@ function EnterpriseBackdrop() {
     </div>
   );
 }
+

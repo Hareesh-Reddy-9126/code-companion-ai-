@@ -152,7 +152,7 @@ export default function Pricing() {
                 <div
                   className={`relative flex h-full flex-col rounded-2xl border p-6 sm:p-7 ${
                     plan.highlight
-                      ? "border-primary/35 bg-[linear-gradient(180deg,hsl(var(--primary)/0.075),hsl(var(--card))_42%)] shadow-signal"
+                      ? "border-primary/35 bg-[linear-gradient(180deg,hsl(var(--brand)/0.075),hsl(var(--card))_42%)] shadow-signal"
                       : "border-border/70 bg-card"
                   }`}
                 >
@@ -377,3 +377,4 @@ function PricingBackdrop() {
     </div>
   );
 }
+

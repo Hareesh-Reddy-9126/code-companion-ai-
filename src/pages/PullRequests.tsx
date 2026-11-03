@@ -276,7 +276,7 @@ export default function PullRequests() {
             </div>
           </section>
 
-          <section className="panel border-primary/20 bg-[linear-gradient(180deg,hsl(var(--primary)/0.05),hsl(var(--card))_52%)] p-5">
+          <section className="panel border-primary/20 bg-[linear-gradient(180deg,hsl(var(--brand)/0.05),hsl(var(--card))_52%)] p-5">
             <div className="flex items-center gap-2">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
               <p className="text-[12.5px] font-medium text-foreground">Want the fix on GitHub?</p>
@@ -296,3 +296,4 @@ export default function PullRequests() {
     </div>
   );
 }
+

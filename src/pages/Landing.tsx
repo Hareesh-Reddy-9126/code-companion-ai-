@@ -66,48 +66,32 @@ export default function Landing() {
       <HeroBackdrop />
 
       {/* ---------------- Hero ---------------- */}
-      <section className="relative pb-14 pt-32 sm:pb-20 sm:pt-40">
+      <section className="relative pb-16 pt-40 sm:pb-24 sm:pt-52">
         <div className="container-page">
           <div className="mx-auto max-w-4xl text-center">
             <Reveal>
-              <span className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-white/[0.025] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground backdrop-blur">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-                </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.03] px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 AI-native engineering intelligence
                 <span className="text-border">/</span>
-                <span className="text-foreground/80">Public beta</span>
+                <span className="text-foreground/70">Public beta</span>
               </span>
             </Reveal>
 
             <Reveal delay={60}>
-              <h1 className="display-xl mx-auto mt-7 max-w-[15ch] text-foreground">
-                Ship code you can{" "}
-                <span className="relative inline-block font-display italic tracking-[-0.03em] text-primary">
-                  defend.
-                  <svg
-                    className="absolute -bottom-2 left-0 w-full text-primary/50"
-                    viewBox="0 0 300 12"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path d="M2 8.5C72 3.5 166 2.5 298 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                </span>
+              <h1 className="text-h1 mx-auto mt-6 max-w-[48ch] text-foreground">
+                Ship code you can <span className="font-medium text-brand">defend.</span>
               </h1>
             </Reveal>
 
             <Reveal delay={120}>
-              <p className="mx-auto mt-7 max-w-[52ch] text-[15px] leading-7 text-muted-foreground sm:text-[17px] sm:leading-8">
-                Review every pull request, surface the security issues humans miss,
+              <p className="mx-auto mt-6 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">
+                Review every pull request, surface security issues humans miss,
                 and hand the fix to an AI agent. Powered by NVIDIA Nemotron.
-                Built for teams that ship on evidence.
               </p>
             </Reveal>
 
             <Reveal delay={180}>
-              <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Button size="lg" className="w-full sm:w-auto" asChild>
                   <Link to="/signup">
                     <span>Start building free <ArrowRight className="h-4 w-4" /></span>
@@ -121,11 +105,11 @@ export default function Landing() {
               </div>
             </Reveal>
 
-            <Reveal delay={240}>
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 font-mono text-[10px] uppercase tracking-[0.13em] text-muted-foreground/80">
-                <span className="inline-flex items-center gap-1.5"><Check className="h-3 w-3 text-primary" /> No credit card</span>
-                <span className="inline-flex items-center gap-1.5"><Check className="h-3 w-3 text-primary" /> GitHub OAuth</span>
-                <span className="inline-flex items-center gap-1.5"><Check className="h-3 w-3 text-primary" /> $0 during beta</span>
+            <Reveal delay={260}>
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 font-mono text-[11px] uppercase tracking-wider text-muted-foreground/60">
+                <span className="inline-flex items-center gap-1.5"><Check className="h-3 w-3 text-brand" /> No credit card</span>
+                <span className="inline-flex items-center gap-1.5"><Check className="h-3 w-3 text-brand" /> GitHub OAuth</span>
+                <span className="inline-flex items-center gap-1.5"><Check className="h-3 w-3 text-brand" /> $0 during beta</span>
               </div>
             </Reveal>
           </div>
@@ -158,35 +142,34 @@ export default function Landing() {
       </section>
 
       {/* ---------------- Positioning ---------------- */}
-      <section className="relative py-20 sm:py-28">
+      <section className="relative py-24 sm:py-32">
         <div className="container-page">
           <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
             <Reveal>
               <p className="eyebrow">The bottleneck</p>
-              <h2 className="display-lg mt-5 max-w-[15ch] text-foreground">
-                Review is where velocity goes to{" "}
-                <span className="font-display italic text-primary">die.</span>
+              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
+                Review is where velocity goes <span className="font-medium text-brand">die.</span>
               </h2>
             </Reveal>
             <Reveal delay={100} className="lg:pt-2">
-              <p className="max-w-[58ch] text-[15px] leading-7 text-muted-foreground sm:text-[16px]">
+              <p className="mt-4 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">
                 Great engineers spend their best hours writing the same comments,
                 missing the same classes of bugs, and waiting for a second pair of
                 eyes. Code Companion turns that work into a system: consistent
                 analysis, traceable findings, and fixes your team can actually use.
               </p>
-              <div className="mt-8 grid gap-px overflow-hidden rounded-xl border border-border/70 bg-border/70 sm:grid-cols-3">
+              <div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-border bg-border/30 sm:grid-cols-3">
                 {[
                   { value: "6", label: "review dimensions", sub: "quality · security · performance · architecture" },
                   { value: "3", label: "model fallbacks", sub: "automatic failover" },
                   { value: "1", label: "review surface", sub: "repo, PR and agent in one place" },
                 ].map((item) => (
-                  <div key={item.label} className="bg-card px-4 py-5">
-                    <p className="text-[26px] font-semibold leading-none tracking-[-0.05em] text-foreground">
+                  <div key={item.label} className="bg-surface px-6 py-8">
+                    <p className="text-[24px] font-semibold leading-none tracking-tight text-foreground">
                       {item.value}
                     </p>
-                    <p className="mt-2 text-[12px] font-medium text-foreground/85">{item.label}</p>
-                    <p className="mt-1 text-[10.5px] leading-4 text-muted-foreground">{item.sub}</p>
+                    <p className="mt-2 text-[11px] font-medium text-foreground/70">{item.label}</p>
+                    <p className="mt-1 text-[10px] leading-4 text-muted-foreground">{item.sub}</p>
                   </div>
                 ))}
               </div>
@@ -196,24 +179,23 @@ export default function Landing() {
       </section>
 
       {/* ---------------- Feature bento ---------------- */}
-      <section id="platform" className="relative py-16 sm:py-24">
+      <section id="platform" className="relative py-24 sm:py-32">
         <div className="container-page">
           <Reveal className="mb-10 flex flex-col gap-5 sm:mb-14 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="eyebrow">The platform</p>
-              <h2 className="display-lg mt-4 max-w-[16ch] text-foreground">
-                One system for the whole{" "}
-                <span className="font-display italic text-primary">review.</span>
+              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
+                One system for the whole <span className="font-medium text-brand">review.</span>
               </h2>
             </div>
-            <p className="max-w-[38ch] text-[14px] leading-6 text-muted-foreground">
+            <p className="mt-4 max-w-[38ch] text-sm leading-relaxed text-muted-foreground">
               Every surface is connected: the repo feeds the review, the review
               feeds the agent, and every finding is traceable back to a file and a line.
             </p>
           </Reveal>
 
-          <div className="grid gap-3 lg:grid-cols-12">
-            <Reveal className="lg:col-span-7">
+          <div className="grid gap-4 lg:grid-cols-3">
+            <Reveal>
               <FeatureCard
                 icon={MessageSquareCode}
                 eyebrow="AI code review"
@@ -224,7 +206,7 @@ export default function Landing() {
               </FeatureCard>
             </Reveal>
 
-            <Reveal delay={70} className="lg:col-span-5">
+            <Reveal delay={70}>
               <FeatureCard
                 icon={ShieldCheck}
                 eyebrow="Security"
@@ -235,7 +217,7 @@ export default function Landing() {
               </FeatureCard>
             </Reveal>
 
-            <Reveal delay={40} className="lg:col-span-5">
+            <Reveal delay={40}>
               <FeatureCard
                 icon={Boxes}
                 eyebrow="Architecture"
@@ -246,7 +228,7 @@ export default function Landing() {
               </FeatureCard>
             </Reveal>
 
-            <Reveal delay={110} className="lg:col-span-7">
+            <Reveal delay={110}>
               <FeatureCard
                 icon={Wand2}
                 eyebrow="AI agent"
@@ -257,7 +239,7 @@ export default function Landing() {
               </FeatureCard>
             </Reveal>
 
-            <Reveal delay={60} className="lg:col-span-4">
+            <Reveal delay={60}>
               <FeatureCard
                 icon={Braces}
                 eyebrow="Models"
@@ -269,7 +251,7 @@ export default function Landing() {
               </FeatureCard>
             </Reveal>
 
-            <Reveal delay={120} className="lg:col-span-4">
+            <Reveal delay={120}>
               <FeatureCard
                 icon={FileCode2}
                 eyebrow="Reporting"
@@ -281,7 +263,7 @@ export default function Landing() {
               </FeatureCard>
             </Reveal>
 
-            <Reveal delay={180} className="lg:col-span-4">
+            <Reveal delay={180}>
               <FeatureCard
                 icon={Terminal}
                 eyebrow="Workflow"
@@ -297,21 +279,20 @@ export default function Landing() {
       </section>
 
       {/* ---------------- Workflow ---------------- */}
-      <section className="relative border-y border-border/60 bg-[#070808] py-20 sm:py-28">
+      <section className="relative border-y border-border bg-[#070808] py-24 sm:py-32">
         <div className="container-page">
           <Reveal className="mx-auto max-w-2xl text-center">
             <p className="eyebrow">How it works</p>
-            <h2 className="display-lg mt-4 text-foreground">
-              From repository to{" "}
-              <span className="font-display italic text-primary">resolved</span> in three moves.
+            <h2 className="text-h2 mt-4 text-foreground">
+              From repository to <span className="font-medium text-brand">resolved</span> in three moves.
             </h2>
-            <p className="mx-auto mt-5 max-w-[48ch] text-[14.5px] leading-7 text-muted-foreground">
+            <p className="mx-auto mt-6 max-w-[48ch] text-sm leading-relaxed text-muted-foreground">
               No workflow migration. No YAML to maintain. Connect GitHub, run a
               review, and decide what ships.
             </p>
           </Reveal>
 
-          <div className="mt-14 grid gap-3 md:grid-cols-3">
+          <div className="mt-14 grid gap-4 md:grid-cols-3">
             {[
               {
                 n: "01",
@@ -398,7 +379,7 @@ export default function Landing() {
                 ),
               },
             ].map((step) => (
-              <div key={step.n} className="group relative rounded-2xl border border-border/70 bg-card p-5 transition-colors hover:border-border sm:p-6">
+              <div key={step.n} className="group relative rounded-xl border border-border bg-card p-6 transition-colors hover:border-border sm:p-8">
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground/60">{step.n}</span>
                   <step.icon className="h-4 w-4 text-muted-foreground/60" />
@@ -413,25 +394,23 @@ export default function Landing() {
       </section>
 
       {/* ---------------- Security ---------------- */}
-      <section className="relative py-20 sm:py-28">
+      <section className="relative py-24 sm:py-32">
         <div className="container-page">
-          <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-[#0A0C0D] p-6 sm:p-10 lg:p-14">
-            <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-primary/[0.06] blur-3xl" />
-            <div className="grid gap-12 lg:grid-cols-[1fr_0.95fr] lg:gap-16">
+          <div className="relative overflow-hidden rounded-xl border border-border bg-[#070808]/50 p-8 sm:p-12 lg:p-16">
+            <div className="grid gap-8 lg:grid-cols-[1fr_0.95fr] lg:gap-16">
               <Reveal>
                 <p className="eyebrow">Security posture</p>
-                <h2 className="display-lg mt-4 max-w-[14ch] text-foreground">
-                  Your code stays{" "}
-                  <span className="font-display italic text-primary">yours.</span>
+                <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
+                  Your code stays <span className="font-medium text-brand">yours.</span>
                 </h2>
-                <p className="mt-5 max-w-[48ch] text-[14px] leading-7 text-muted-foreground">
+                <p className="mt-6 max-w-[48ch] text-sm leading-relaxed text-muted-foreground">
                   Security is architecture, not a badge. Tokens are encrypted
                   before they touch the database, every table is scoped to its
                   owner, and inference happens through NVIDIA's API — never in
                   your browser.
                 </p>
 
-                <div className="mt-8 space-y-3">
+                <div className="mt-10 space-y-4">
                   {[
                     {
                       icon: LockKeyhole,
@@ -454,13 +433,13 @@ export default function Landing() {
                       copy: "Designed around SOC 2 requirements. Certification is in progress — not yet completed.",
                     },
                   ].map((item) => (
-                    <div key={item.title} className="flex gap-3.5 rounded-xl border border-border/50 bg-white/[0.015] p-3.5">
-                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-secondary/60 text-primary">
+                    <div key={item.title} className="flex gap-3 rounded-lg border border-border bg-card p-4">
+                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-brand">
                         <item.icon className="h-3.5 w-3.5" />
                       </span>
                       <div>
-                        <p className="text-[12.5px] font-medium text-foreground">{item.title}</p>
-                        <p className="mt-0.5 text-[11.5px] leading-5 text-muted-foreground">{item.copy}</p>
+                        <p className="text-sm font-medium text-foreground">{item.title}</p>
+                        <p className="mt-0.5 text-[11px] leading-5 text-muted-foreground">{item.copy}</p>
                       </div>
                     </div>
                   ))}
@@ -468,37 +447,37 @@ export default function Landing() {
               </Reveal>
 
               <Reveal delay={120} className="lg:pt-6">
-                <div className="overflow-hidden rounded-2xl border border-border/70 bg-[#08090A] shadow-panel">
-                  <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
+                <div className="overflow-hidden rounded-lg border border-border bg-[#08090A] shadow-sm">
+                  <div className="flex items-center justify-between border-b border-border px-4 py-3">
                     <div className="flex items-center gap-1.5">
                       <span className="h-2 w-2 rounded-full bg-[#FF5F57]/70" />
                       <span className="h-2 w-2 rounded-full bg-[#FEBC2E]/70" />
                       <span className="h-2 w-2 rounded-full bg-[#28C840]/70" />
                     </div>
-                    <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground/60">
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
                       request trace
                     </span>
                   </div>
-                  <div className="space-y-1 p-5 font-mono text-[10.5px] leading-6 text-muted-foreground">
-                    <p><span className="text-primary">→</span> browser <span className="text-muted-foreground/40">────</span> edge function <span className="text-foreground/70">verify JWT</span></p>
-                    <p><span className="text-primary">→</span> decrypt <span className="text-foreground/70">github token</span> <span className="text-muted-foreground/50">AES-256-GCM</span></p>
-                    <p><span className="text-primary">→</span> github api <span className="text-foreground/70">fetch repository tree</span></p>
-                    <p><span className="text-primary">→</span> nvidia nim <span className="text-foreground/70">nemotron 3 ultra</span></p>
-                    <p><span className="text-primary">←</span> structured report <span className="text-success">validated json</span></p>
-                    <p><span className="text-primary">←</span> postgres <span className="text-foreground/70">RLS-scoped insert</span></p>
+                  <div className="space-y-1 p-5 font-mono text-xs leading-6 text-muted-foreground">
+                    <p><span className="text-brand">→</span> browser <span className="text-muted-foreground/40">────</span> edge function <span className="text-foreground/70">verify JWT</span></p>
+                    <p><span className="text-brand">→</span> decrypt <span className="text-foreground/70">github token</span> <span className="text-muted-foreground/50">AES-256-GCM</span></p>
+                    <p><span className="text-brand">→</span> github api <span className="text-foreground/70">fetch repository tree</span></p>
+                    <p><span className="text-brand">→</span> nvidia nim <span className="text-foreground/70">nemotron 3 ultra</span></p>
+                    <p><span className="text-brand">←</span> structured report <span className="text-success">validated json</span></p>
+                    <p><span className="text-brand">←</span> postgres <span className="text-foreground/70">RLS-scoped insert</span></p>
                   </div>
-                  <div className="border-t border-border/60 p-5">
-                    <div className="flex items-center justify-between rounded-xl border border-border/60 bg-white/[0.02] p-3.5">
-                      <div className="flex items-center gap-2.5">
-                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <div className="border-t border-border p-4">
+                    <div className="flex items-center justify-between rounded-lg border border-border bg-white/[0.02] p-3">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand/10 text-brand">
                           <ShieldCheck className="h-3.5 w-3.5" />
                         </span>
                         <div>
-                          <p className="text-[11px] font-medium text-foreground">Token never reaches the client</p>
-                          <p className="font-mono text-[9px] text-muted-foreground">server-side only</p>
+                          <p className="text-sm font-medium text-foreground">Token never reaches the client</p>
+                          <p className="font-mono text-[10px] text-muted-foreground">server-side only</p>
                         </div>
                       </div>
-                      <span className="rounded-full border border-success/25 bg-success/10 px-2 py-0.5 font-mono text-[8.5px] uppercase tracking-[0.1em] text-success">
+                      <span className="rounded-full border border-brand/25 bg-brand/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-brand">
                         verified
                       </span>
                     </div>
@@ -524,14 +503,13 @@ export default function Landing() {
       </section>
 
       {/* ---------------- Pricing preview ---------------- */}
-      <section className="relative pb-20 pt-4 sm:pb-28">
+      <section className="relative pb-24 pt-8 sm:pb-32">
         <div className="container-page">
           <Reveal className="mb-10 flex flex-col gap-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="eyebrow">Pricing</p>
-              <h2 className="display-md mt-4 text-foreground">
-                Free while we earn{" "}
-                <span className="font-display italic text-primary">trust.</span>
+              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
+                Free while we earn <span className="font-medium text-brand">trust.</span>
               </h2>
             </div>
             <Button variant="outline" size="sm" asChild>
@@ -541,7 +519,7 @@ export default function Landing() {
             </Button>
           </Reveal>
 
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             {[
               {
                 name: "Starter",
@@ -576,30 +554,30 @@ export default function Landing() {
             ].map((plan) => (
               <div
                 key={plan.name}
-                className={`relative flex flex-col rounded-2xl border p-6 ${
+                className={`relative flex flex-col rounded-xl border border-border bg-card p-8 ${
                   plan.highlight
-                    ? "border-primary/35 bg-[linear-gradient(180deg,hsl(var(--primary)/0.07),hsl(var(--card))_45%)]"
-                    : "border-border/70 bg-card"
+                    ? "border-brand bg-brand/5"
+                    : ""
                 }`}
               >
                 {plan.highlight && (
-                  <span className="absolute -top-2.5 left-6 rounded-full border border-primary/30 bg-primary px-2.5 py-0.5 font-mono text-[8.5px] uppercase tracking-[0.12em] text-primary-foreground">
+                  <span className="absolute -top-3 left-8 rounded-full border border-brand bg-brand px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-brand-foreground">
                     Planned tier
                   </span>
                 )}
                 <div className="flex items-center justify-between">
-                  <p className="text-[13px] font-medium text-foreground">{plan.name}</p>
-                  <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground/60">{plan.note}</span>
+                  <p className="text-sm font-medium text-foreground">{plan.name}</p>
+                  <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground/60">{plan.note}</span>
                 </div>
-                <div className="mt-5 flex items-baseline gap-1.5">
-                  <span className="text-[38px] font-semibold leading-none tracking-[-0.055em] text-foreground">{plan.price}</span>
-                  {plan.price === "$49" && <span className="text-[11px] text-muted-foreground">/ month</span>}
+                <div className="mt-6 flex items-baseline gap-1">
+                  <span className="text-[32px] font-medium leading-none tracking-tight text-foreground">{plan.price}</span>
+                  {plan.price === "$49" && <span className="text-xs text-muted-foreground">/ month</span>}
                 </div>
-                <p className="mt-3 text-[12px] leading-5 text-muted-foreground">{plan.copy}</p>
-                <ul className="mt-5 flex-1 space-y-2.5 border-t border-border/60 pt-5">
+                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{plan.copy}</p>
+                <ul className="mt-6 flex-1 space-y-3 border-t border-border pt-6">
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2.5 text-[12px] text-muted-foreground">
-                      <Check className="h-3 w-3 shrink-0 text-primary" />
+                    <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Check className="h-3 w-3 shrink-0 text-brand" />
                       {feature}
                     </li>
                   ))}
@@ -625,21 +603,20 @@ export default function Landing() {
       </section>
 
       {/* ---------------- Open source ---------------- */}
-      <section className="relative border-y border-border/60 bg-[#070808] py-20 sm:py-24">
+      <section className="relative border-y border-border bg-[#070808]/50 py-24 sm:py-32">
         <div className="container-page">
           <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
             <Reveal>
               <p className="eyebrow">Built in public</p>
-              <h2 className="display-lg mt-4 max-w-[16ch] text-foreground">
-                Don't trust the pitch.{" "}
-                <span className="font-display italic text-primary">Read the code.</span>
+              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
+                Don't trust the pitch. <span className="font-medium text-brand">Read the code.</span>
               </h2>
-              <p className="mt-5 max-w-[50ch] text-[14px] leading-7 text-muted-foreground">
+              <p className="mt-6 max-w-[50ch] text-sm leading-relaxed text-muted-foreground">
                 The entire product — edge functions, database policies, CLI and
                 this frontend — is open for inspection. If a claim on this page
                 isn't backed by the repository, it doesn't belong here.
               </p>
-              <div className="mt-7 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-wrap gap-3">
                 <Button variant="outline" asChild>
                   <a href="https://github.com/Hareesh-Reddy-9126/code-companion-ai-" target="_blank" rel="noreferrer">
                     <span><GitBranch className="h-4 w-4" /> View the repository</span>
@@ -654,17 +631,17 @@ export default function Landing() {
             </Reveal>
 
             <Reveal delay={100}>
-              <div className="overflow-hidden rounded-2xl border border-border/70 bg-[#08090A] shadow-panel">
+              <div className="overflow-hidden rounded-lg border border-border bg-[#08090A] shadow-sm">
                 <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
                   <div className="flex items-center gap-2">
                     <LogoMark size="sm" />
                     <span className="font-mono text-[10px] text-muted-foreground">code-companion-ai</span>
                   </div>
-                  <span className="rounded-full border border-success/25 bg-success/10 px-2 py-0.5 font-mono text-[8.5px] uppercase tracking-[0.1em] text-success">
+                  <span className="rounded-full border border-brand/25 bg-brand/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-brand">
                     public
                   </span>
                 </div>
-                <div className="p-5 font-mono text-[11px] leading-7">
+                <div className="p-6 font-mono text-xs leading-7">
                   <p className="text-muted-foreground/50">$ git clone github.com/Hareesh-Reddy-9126/code-companion-ai-</p>
                   <p className="mt-3 text-muted-foreground/50">$ npm install && npm run dev</p>
                   <p className="mt-3 text-primary">▲ ready in 1.2s</p>
@@ -696,38 +673,37 @@ export default function Landing() {
       </section>
 
       {/* ---------------- FAQ ---------------- */}
-      <section className="py-20 sm:py-28">
+      <section className="py-24 sm:py-32">
         <div className="container-page">
           <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
             <Reveal>
               <p className="eyebrow">Questions</p>
-              <h2 className="display-lg mt-4 max-w-[12ch] text-foreground">
-                Straight{" "}
-                <span className="font-display italic text-primary">answers.</span>
+              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
+                Straight <span className="font-medium text-brand">answers.</span>
               </h2>
-              <p className="mt-5 max-w-[34ch] text-[13.5px] leading-6 text-muted-foreground">
+              <p className="mt-6 max-w-[34ch] text-sm leading-relaxed text-muted-foreground">
                 No fine print, no fake countdowns. If something isn't live yet,
                 it's labeled as planned.
               </p>
               <a
                 href="mailto:support@codecompanion.ai"
-                className="mt-6 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-primary hover:underline"
+                className="mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:underline"
               >
                 Ask us anything <ArrowUpRight className="h-3.5 w-3.5" />
               </a>
             </Reveal>
 
             <Reveal delay={100}>
-              <div className="divide-y divide-border/60 border-y border-border/60">
+              <div className="divide-y divide-border border-y border-border">
                 {faqs.map((faq) => (
-                  <details key={faq.q} className="group py-5">
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-[14px] font-medium text-foreground marker:hidden">
+                  <details key={faq.q} className="group py-6">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-sm font-medium text-foreground marker:hidden">
                       {faq.q}
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border/70 text-muted-foreground transition-transform duration-300 group-open:rotate-45">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-transform duration-300 group-open:rotate-45">
                         <span className="text-base leading-none">+</span>
                       </span>
                     </summary>
-                    <p className="mt-3 max-w-[60ch] text-[13px] leading-6 text-muted-foreground">{faq.a}</p>
+                    <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-muted-foreground">{faq.a}</p>
                   </details>
                 ))}
               </div>
@@ -737,17 +713,15 @@ export default function Landing() {
       </section>
 
       {/* ---------------- CTA ---------------- */}
-      <section className="relative overflow-hidden bg-bone text-bone-foreground">
-        <div className="pointer-events-none absolute inset-0 dot-grid opacity-[0.35] [background-image:radial-gradient(rgba(0,0,0,0.12)_1px,transparent_1px)]" />
-        <div className="container-page relative py-20 sm:py-24">
+      <section className="relative overflow-hidden py-24 sm:py-32">
+        <div className="container-page relative">
           <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
             <Reveal>
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-black/45">Start today</p>
-              <h2 className="display-lg mt-4 max-w-[15ch]">
-                Make review your{" "}
-                <span className="font-display italic">advantage.</span>
+              <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground/60">Start today</p>
+              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
+                Make review your <span className="font-medium text-brand">advantage.</span>
               </h2>
-              <p className="mt-5 max-w-[48ch] text-[14px] leading-7 text-black/60">
+              <p className="mt-6 max-w-[48ch] text-sm leading-relaxed text-muted-foreground">
                 Connect a repository, run your first analysis, and see what your
                 team has been missing. It takes about four minutes.
               </p>
@@ -761,7 +735,6 @@ export default function Landing() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-black/20 bg-transparent text-bone-foreground hover:bg-black/[0.05]"
                 asChild
               >
                 <Link to="/enterprise"><span>Talk to us</span></Link>
@@ -769,15 +742,15 @@ export default function Landing() {
             </Reveal>
           </div>
 
-          <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-black/10 bg-black/10 sm:grid-cols-3">
+          <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-border bg-card sm:grid-cols-3">
             {[
               { k: "No credit card", v: "Start with GitHub OAuth" },
               { k: "EU data region", v: "Stockholm · eu-north-1" },
               { k: "Full transparency", v: "Public repository, honest docs" },
             ].map((item) => (
-              <div key={item.k} className="bg-bone px-5 py-4">
+              <div key={item.k} className="bg-card px-5 py-4">
                 <p className="text-[12px] font-medium">{item.k}</p>
-                <p className="mt-0.5 font-mono text-[9.5px] uppercase tracking-[0.1em] text-black/45">{item.v}</p>
+                <p className="mt-0.5 font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted-foreground">{item.v}</p>
               </div>
             ))}
           </div>
@@ -1158,8 +1131,8 @@ function ArchitectureVisual() {
         <g>
           <rect x="8" y="50" width="44" height="30" rx="7" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" />
           <text x="30" y="68" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="7" fontFamily="JetBrains Mono">web</text>
-          <rect x="100" y="35" width="48" height="60" rx="8" fill="hsl(var(--primary)/0.1)" stroke="hsl(var(--primary)/0.3)" />
-          <text x="124" y="61" textAnchor="middle" fill="hsl(var(--primary))" fontSize="7" fontFamily="JetBrains Mono">api</text>
+          <rect x="100" y="35" width="48" height="60" rx="8" fill="hsl(var(--brand)/0.1)" stroke="hsl(var(--brand)/0.3)" />
+          <text x="124" y="61" textAnchor="middle" fill="hsl(var(--brand))" fontSize="7" fontFamily="JetBrains Mono">api</text>
           <text x="124" y="75" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="6" fontFamily="JetBrains Mono">domain</text>
           <rect x="196" y="28" width="52" height="28" rx="7" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" />
           <text x="222" y="46" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="7" fontFamily="JetBrains Mono">worker</text>
@@ -1275,3 +1248,4 @@ function CliVisual() {
     </div>
   );
 }
+

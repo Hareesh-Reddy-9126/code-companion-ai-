@@ -630,8 +630,8 @@ function ArchitecturePanel() {
             <rect x="10" y="63" width="60" height="34" rx="8" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" />
             <text x="40" y="84" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="8" fontFamily="JetBrains Mono">web</text>
 
-            <rect x="108" y="46" width="70" height="68" rx="10" fill="hsl(var(--primary)/0.1)" stroke="hsl(var(--primary)/0.3)" />
-            <text x="143" y="75" textAnchor="middle" fill="hsl(var(--primary))" fontSize="8" fontFamily="JetBrains Mono">api</text>
+            <rect x="108" y="46" width="70" height="68" rx="10" fill="hsl(var(--brand)/0.1)" stroke="hsl(var(--brand)/0.3)" />
+            <text x="143" y="75" textAnchor="middle" fill="hsl(var(--brand))" fontSize="8" fontFamily="JetBrains Mono">api</text>
             <text x="143" y="89" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="7" fontFamily="JetBrains Mono">domain</text>
 
             <rect x="216" y="36" width="66" height="32" rx="8" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" />
@@ -671,3 +671,4 @@ function ArchitecturePanel() {
 function DatabaseIcon(props: React.ComponentProps<typeof Zap>) {
   return <Zap {...props} />;
 }
+

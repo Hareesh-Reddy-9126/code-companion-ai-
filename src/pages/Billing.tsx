@@ -207,7 +207,7 @@ export default function Billing() {
             key={plan.name}
             className={`flex flex-col rounded-2xl border p-5 ${
               plan.status === "planned"
-                ? "border-primary/25 bg-[linear-gradient(180deg,hsl(var(--primary)/0.05),hsl(var(--card))_45%)]"
+                ? "border-primary/25 bg-[linear-gradient(180deg,hsl(var(--brand)/0.05),hsl(var(--card))_45%)]"
                 : "border-border/70 bg-card"
             }`}
           >
@@ -343,3 +343,4 @@ function UsageCell({ label, value, hint }: { label: string; value: string; hint?
     </div>
   );
 }
+

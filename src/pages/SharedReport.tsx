@@ -246,7 +246,7 @@ export default function SharedReport() {
           </p>
 
           {/* CTA */}
-          <div className="mt-8 overflow-hidden rounded-2xl border border-border/70 bg-[linear-gradient(180deg,hsl(var(--primary)/0.055),hsl(var(--card))_45%)] p-6 sm:p-8">
+          <div className="mt-8 overflow-hidden rounded-2xl border border-border/70 bg-[linear-gradient(180deg,hsl(var(--brand)/0.055),hsl(var(--card))_45%)] p-6 sm:p-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-[17px] font-semibold tracking-[-0.03em] text-foreground">
@@ -292,3 +292,4 @@ function formatType(type?: string) {
   if (!type) return "Full review";
   return type.replace(/_/g, " ").replace(/\b\w/g, (character) => character.toUpperCase());
 }
+
