@@ -1,0 +1,190 @@
+{
+  "name": "code-companion-ai",
+  "displayName": "Code Companion AI",
+  "description": "AI-powered code review, security scanning, and autonomous fixes in your editor. Powered by NVIDIA Nemotron.",
+  "version": "0.1.0",
+  "publisher": "code-companion-ai",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Linters",
+    "AI"
+  ],
+  "keywords": [
+    "ai",
+    "code-review",
+    "security",
+    "static-analysis",
+    "nemotron",
+    "autonomous-fix"
+  ],
+  "icon": "media/icon.svg",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hareesh-Reddy-9126/code-companion-ai-.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Hareesh-Reddy-9126/code-companion-ai-.git/issues"
+  },
+  "homepage": "https://code-companion-ai.hareeshreddy916.workers.dev",
+  "activationEvents": [
+    "onCommand:code-companion.analyzeFile",
+    "onCommand:code-companion.analyzeWorkspace",
+    "onCommand:code-companion.reviewPR",
+    "onCommand:code-companion.dispatchAgent",
+    "onCommand:code-companion.login",
+    "onCommand:code-companion.logout",
+    "onView:code-companion.findings"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "code-companion.analyzeFile",
+        "title": "Analyze Current File",
+        "category": "Code Companion",
+        "icon": "$(search)"
+      },
+      {
+        "command": "code-companion.analyzeWorkspace",
+        "title": "Analyze Workspace",
+        "category": "Code Companion",
+        "icon": "$(search)"
+      },
+      {
+        "command": "code-companion.reviewPR",
+        "title": "Review Pull Request",
+        "category": "Code Companion",
+        "icon": "$(git-pull-request)"
+      },
+      {
+        "command": "code-companion.dispatchAgent",
+        "title": "Dispatch AI Agent",
+        "category": "Code Companion",
+        "icon": "$(robot)"
+      },
+      {
+        "command": "code-companion.login",
+        "title": "Sign In to Code Companion",
+        "category": "Code Companion",
+        "icon": "$(account)"
+      },
+      {
+        "command": "code-companion.logout",
+        "title": "Sign Out",
+        "category": "Code Companion",
+        "icon": "$(sign-out)"
+      },
+      {
+        "command": "code-companion.openDashboard",
+        "title": "Open Dashboard",
+        "category": "Code Companion",
+        "icon": "$(dashboard)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "code-companion",
+          "title": "Code Companion",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "code-companion": [
+        {
+          "id": "code-companion.findings",
+          "name": "Findings",
+          "type": "webview"
+        },
+        {
+          "id": "code-companion.reviews",
+          "name": "Reviews",
+          "type": "webview"
+        },
+        {
+          "id": "code-companion.settings",
+          "name": "Settings",
+          "type": "webview"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Code Companion AI",
+      "properties": {
+        "code-companion.apiUrl": {
+          "type": "string",
+          "default": "https://code-companion-ai.hareeshreddy916.workers.dev",
+          "description": "API base URL"
+        },
+        "code-companion.autoAnalyzeOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically analyze file on save"
+        },
+        "code-companion.showInlineAnnotations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show findings as inline annotations"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "code-companion.analyzeFile",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "code-companion.reviewPR",
+        "key": "ctrl+shift+r",
+        "mac": "cmd+shift+r",
+        "when": "editorTextFocus"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "code-companion.analyzeFile",
+          "group": "navigation@1",
+          "when": "editorTextFocus"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "code-companion.analyzeFile",
+          "group": "navigation@1",
+          "when": "editorTextFocus"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "code-companion.analyzeWorkspace",
+          "group": "navigation@1"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "eslint": "^8.55.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "vsce": "^2.15.0"
+  }
+}
