@@ -1,9 +1,11 @@
-import { Bot, Mail, Lock, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, Loader2, Lock, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthField } from "@/components/auth/AuthField";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,55 +15,74 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setLoading(true);
     const { error } = await signIn(email, password);
     setLoading(false);
     if (error) {
-      toast({ title: "Login failed", description: error.message, variant: "destructive" });
+      toast({ title: "Sign-in failed", description: error.message, variant: "destructive" });
     } else {
-      navigate("/");
+      navigate("/dashboard");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
-              <Bot className="h-8 w-8 text-primary" />
-            </div>
-          </div>
-          <h1 className="text-2xl font-bold">
-            Welcome to <span className="text-primary">CodeInsight</span>
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Sign in to your account</p>
-        </div>
+    <AuthShell
+      eyebrow="Welcome back"
+      title="Sign in to your workspace."
+      description="Pick up where your last review left off."
+      footer={
+        <>
+          New to Code Companion?{" "}
+          <Link to="/signup" className="font-medium text-primary hover:underline">
+            Create an account
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthField
+          icon={Mail}
+          label="Work email"
+          type="email"
+          placeholder="you@company.com"
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+        />
+        <AuthField
+          icon={Lock}
+          label="Password"
+          type="password"
+          placeholder="Your password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+        />
 
-        <form onSubmit={handleSubmit} className="glass-card p-6 space-y-4">
-          <AuthField icon={Mail} type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <AuthField icon={Lock} type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <Button className="w-full" type="submit" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"} {!loading && <ArrowRight className="h-4 w-4 ml-2" />}
-          </Button>
-        </form>
+        <Button type="submit" size="lg" className="mt-2 w-full" disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" /> Signing in
+            </>
+          ) : (
+            <>
+              Sign in <ArrowRight className="h-4 w-4" />
+            </>
+          )}
+        </Button>
+      </form>
 
-        <p className="text-center text-sm text-muted-foreground">
-          Don't have an account?{" "}
-          <Link to="/signup" className="text-primary hover:underline">Sign up</Link>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function AuthField({ icon: Icon, ...props }: { icon: any } & React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <div className="flex items-center gap-2 bg-secondary/50 rounded-lg px-3 py-2.5 border border-border/50">
-      <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
-      <input className="bg-transparent outline-none text-sm flex-1 placeholder:text-muted-foreground" {...props} />
-    </div>
+      <p className="mt-5 text-center text-[11px] leading-5 text-muted-foreground/70">
+        Trouble signing in? Email{" "}
+        <a href="mailto:support@codecompanion.ai" className="text-foreground/80 underline decoration-border underline-offset-4 hover:decoration-primary">
+          support@codecompanion.ai
+        </a>
+        . Automated password reset is not enabled during the beta.
+      </p>
+    </AuthShell>
   );
 }

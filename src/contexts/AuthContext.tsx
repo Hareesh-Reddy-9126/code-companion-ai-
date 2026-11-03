@@ -10,6 +10,7 @@ interface Profile {
   avatar_url: string | null;
   github_username: string | null;
   github_access_token: string | null;
+  is_admin?: boolean;
 }
 
 interface AuthContextType {

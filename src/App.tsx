@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
+import { SiteLayout } from "@/components/site/SiteLayout";
+import { LogoMark } from "@/components/brand/Logo";
 import Landing from "./pages/Landing";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -39,8 +41,14 @@ const queryClient = new QueryClient();
 
 function PageLoader() {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex flex-col items-center gap-4">
+        <LogoMark size="lg" />
+        <div className="h-1 w-24 overflow-hidden rounded-full bg-border">
+          <div className="h-full w-1/2 animate-shimmer rounded-full bg-gradient-to-r from-transparent via-primary to-transparent" />
+        </div>
+        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Loading workspace</span>
+      </div>
     </div>
   );
 }
@@ -54,20 +62,25 @@ const App = () => (
         <AuthProvider>
           <Suspense fallback={<PageLoader />}>
             <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Landing />} />
+              {/* Public marketing + legal routes */}
+              <Route element={<SiteLayout />}>
+                <Route path="/" element={<Landing />} />
+                <Route path="/features" element={<Features />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/enterprise" element={<Enterprise />} />
+                <Route path="/docs" element={<ApiDocs />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/security-policy" element={<SecurityPage />} />
+              </Route>
+
+              {/* Standalone auth + shared routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/features" element={<Features />} />
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/enterprise" element={<Enterprise />} />
-              <Route path="/docs" element={<ApiDocs />} />
               <Route path="/report/:analysisId" element={<SharedReport />} />
               <Route path="/auth/github/callback" element={<GitHubCallbackHandler />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/security-policy" element={<SecurityPage />} />
-              {/* Protected routes */}
+
+              {/* Protected app routes */}
               <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/repositories" element={<Repositories />} />
