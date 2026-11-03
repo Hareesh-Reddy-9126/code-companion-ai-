@@ -16,6 +16,8 @@ import {
   toAnalysisResult,
 } from "../_shared/ai.ts";
 import { decrypt } from "../_shared/crypto.ts";
+import { logAudit, AUDIT_ACTIONS } from "../_shared/audit.ts";
+import { checkRateLimit, getRateLimitHeaders, getOrgPlan, PLAN_LIMITS } from "../_shared/rate-limit.ts";
 
 const SYSTEM_PROMPT = `You are a senior staff engineer performing a pull request code review.
 
@@ -50,6 +52,31 @@ serve(async (req) => {
   try {
     const userId = await getUserIdFromRequest(req);
     const admin = serviceClient();
+
+    // Get user's org and plan
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("org_id")
+      .eq("user_id", userId)
+      .single();
+    const orgId = profile?.org_id;
+    const plan = orgId ? await getOrgPlan(orgId) : "free";
+    const limits = PLAN_LIMITS[plan];
+
+    // Check rate limit
+    const rateLimit = await checkRateLimit(`user:${userId}:analyze-pr`, {
+      maxRequests: limits.analysesPerDay,
+      windowMs: 86400000, // 24 hours
+      keyPrefix: "analyze-pr",
+    });
+
+    if (!rateLimit.allowed) {
+      return corsResponse(
+        { error: "Daily analysis limit reached. Upgrade your plan for more." },
+        { status: 429 },
+        getRateLimitHeaders(rateLimit),
+      );
+    }
 
     const { prUrl } = await req.json();
     if (!prUrl) {
@@ -86,6 +113,7 @@ serve(async (req) => {
       .from("analysis_jobs")
       .insert({
         user_id: userId,
+        org_id: orgId,
         pr_url: prUrl,
         analysis_type: "pr_review",
         status: "fetching",
@@ -93,6 +121,16 @@ serve(async (req) => {
       .select()
       .single();
     if (jobError) throw jobError;
+
+    await logAudit({
+      org_id: orgId,
+      user_id: userId,
+      action: AUDIT_ACTIONS.PR_REVIEW_START,
+      resource_type: "pull_request",
+      resource_id: prNumber,
+      metadata: { owner, repo, pr_url: prUrl },
+      success: true,
+    });
 
     // Fetch PR diff
     let prData: any;
@@ -110,9 +148,22 @@ serve(async (req) => {
           completed_at: new Date().toISOString(),
         })
         .eq("id", job.id);
+
+      await logAudit({
+        org_id: orgId,
+        user_id: userId,
+        action: AUDIT_ACTIONS.PR_REVIEW_COMPLETE,
+        resource_type: "pull_request",
+        resource_id: prNumber,
+        metadata: { owner, repo, error: ghErr.message },
+        success: false,
+        error_message: ghErr.message,
+      });
+
       return corsResponse(
         { error: "Failed to fetch PR from GitHub" },
         { status: 400 },
+        getRateLimitHeaders(rateLimit),
       );
     }
 
@@ -152,13 +203,26 @@ ${diffContext}`;
       await admin.from("error_events").insert({
         function_name: "analyze-pr",
         user_id: userId,
+        org_id: orgId,
         error_message: aiErr.message,
         context: { pr_url: prUrl },
+      });
+
+      await logAudit({
+        org_id: orgId,
+        user_id: userId,
+        action: AUDIT_ACTIONS.PR_REVIEW_COMPLETE,
+        resource_type: "pull_request",
+        resource_id: prNumber,
+        metadata: { error: aiErr.message },
+        success: false,
+        error_message: aiErr.message,
       });
 
       return corsResponse(
         { error: "AI analysis failed. Please try again later." },
         { status: 502 },
+        getRateLimitHeaders(rateLimit),
       );
     }
 
@@ -179,6 +243,7 @@ ${diffContext}`;
       return corsResponse(
         { error: "AI response could not be parsed. Please try again." },
         { status: 502 },
+        getRateLimitHeaders(rateLimit),
       );
     }
 
@@ -190,6 +255,7 @@ ${diffContext}`;
       .from("pr_analyses")
       .insert({
         user_id: userId,
+        org_id: orgId,
         pr_url: prUrl,
         pr_title: prData.title || "Untitled",
         pr_number: prData.number ?? null,
@@ -216,6 +282,16 @@ ${diffContext}`;
       })
       .eq("id", job.id);
 
+    await logAudit({
+      org_id: orgId,
+      user_id: userId,
+      action: AUDIT_ACTIONS.PR_REVIEW_COMPLETE,
+      resource_type: "pull_request",
+      resource_id: prNumber,
+      metadata: { assessment: analysis.overall_assessment, findings: analysis.comments?.length || 0 },
+      success: true,
+    });
+
     return corsResponse({
       report: {
         ...analysis,
@@ -228,7 +304,7 @@ ${diffContext}`;
       },
       job_id: job.id,
       model: result.model,
-    });
+    }, getRateLimitHeaders(rateLimit));
   } catch (error: any) {
     console.error("analyze-pr error:", error);
     try {

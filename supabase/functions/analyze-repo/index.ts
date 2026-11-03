@@ -16,6 +16,8 @@ import {
   toAnalysisResult,
 } from "../_shared/ai.ts";
 import { decrypt } from "../_shared/crypto.ts";
+import { logAudit, AUDIT_ACTIONS } from "../_shared/audit.ts";
+import { checkRateLimit, getRateLimitHeaders, getOrgPlan, PLAN_LIMITS } from "../_shared/rate-limit.ts";
 
 const SYSTEM_PROMPT = `You are a senior staff engineer at a top-tier tech company performing a comprehensive codebase review.
 
@@ -35,6 +37,14 @@ Required JSON schema:
   "security_issues": [
     {"file": "<path>", "severity": "critical|high|medium|low", "issue": "<description>", "line": <optional number>}
   ],
+  "performance_issues": [
+    {"file": "<path>", "impact": "high|medium|low", "issue": "<description>"}
+  ],
+  "architecture_findings": [
+    {"category": "<category>", "status": "good|warning|critical", "notes": ["<note 1>", "..."]}
+  ],
+  "detected_pattern": "<pattern name>",
+  "pattern_description": "<description>",
   "overall_assessment": "approve|request_changes|comment"
 }
 
@@ -49,6 +59,31 @@ serve(async (req) => {
   try {
     const userId = await getUserIdFromRequest(req);
     const admin = serviceClient();
+
+    // Get user's org and plan
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("org_id")
+      .eq("user_id", userId)
+      .single();
+    const orgId = profile?.org_id;
+    const plan = orgId ? await getOrgPlan(orgId) : "free";
+    const limits = PLAN_LIMITS[plan];
+
+    // Check rate limit
+    const rateLimit = await checkRateLimit(`user:${userId}:analyze-repo`, {
+      maxRequests: limits.analysesPerDay,
+      windowMs: 86400000,
+      keyPrefix: "analyze-repo",
+    });
+
+    if (!rateLimit.allowed) {
+      return corsResponse(
+        { error: "Daily analysis limit reached. Upgrade your plan for more." },
+        { status: 429 },
+        getRateLimitHeaders(rateLimit),
+      );
+    }
 
     const { repoId, analysisType = "full_review" } = await req.json();
     if (!repoId) {
@@ -87,6 +122,7 @@ serve(async (req) => {
       .from("analysis_jobs")
       .insert({
         user_id: userId,
+        org_id: orgId,
         repo_id: repoId,
         analysis_type: analysisType,
         status: "fetching",
@@ -94,6 +130,16 @@ serve(async (req) => {
       .select()
       .single();
     if (jobError) throw jobError;
+
+    await logAudit({
+      org_id: orgId,
+      user_id: userId,
+      action: AUDIT_ACTIONS.ANALYSIS_START,
+      resource_type: "repository",
+      resource_id: repoId,
+      metadata: { repo_name: repo.repo_name, analysis_type: analysisType },
+      success: true,
+    });
 
     // Fetch code files from GitHub
     const [owner, repoName] = repo.repo_name.split("/");
@@ -112,9 +158,22 @@ serve(async (req) => {
           completed_at: new Date().toISOString(),
         })
         .eq("id", job.id);
+
+      await logAudit({
+        org_id: orgId,
+        user_id: userId,
+        action: AUDIT_ACTIONS.ANALYSIS_FAILED,
+        resource_type: "repository",
+        resource_id: repoId,
+        metadata: { error: "No analyzable files found" },
+        success: false,
+        error_message: "No analyzable files found",
+      });
+
       return corsResponse(
         { error: "No analyzable files found in repository" },
         { status: 400 },
+        getRateLimitHeaders(rateLimit),
       );
     }
 
@@ -158,13 +217,26 @@ ${codeContext}`;
       await admin.from("error_events").insert({
         function_name: "analyze-repo",
         user_id: userId,
+        org_id: orgId,
         error_message: aiErr.message,
         context: { repo_id: repoId },
+      });
+
+      await logAudit({
+        org_id: orgId,
+        user_id: userId,
+        action: AUDIT_ACTIONS.ANALYSIS_FAILED,
+        resource_type: "repository",
+        resource_id: repoId,
+        metadata: { error: aiErr.message },
+        success: false,
+        error_message: aiErr.message,
       });
 
       return corsResponse(
         { error: "AI analysis failed. Please try again later." },
         { status: 502 },
+        getRateLimitHeaders(rateLimit),
       );
     }
 
@@ -185,6 +257,7 @@ ${codeContext}`;
       return corsResponse(
         { error: "AI response could not be parsed. Please try again." },
         { status: 502 },
+        getRateLimitHeaders(rateLimit),
       );
     }
 
@@ -197,6 +270,7 @@ ${codeContext}`;
       .insert({
         repo_id: repoId,
         user_id: userId,
+        org_id: orgId,
         quality_score: analysis.quality_score,
         security_score: analysis.security_score,
         performance_score: analysis.performance_score,
@@ -220,6 +294,21 @@ ${codeContext}`;
       })
       .eq("id", job.id);
 
+    await logAudit({
+      org_id: orgId,
+      user_id: userId,
+      action: AUDIT_ACTIONS.ANALYSIS_COMPLETE,
+      resource_type: "repository",
+      resource_id: repoId,
+      metadata: { 
+        quality: analysis.quality_score, 
+        security: analysis.security_score,
+        performance: analysis.performance_score,
+        architecture: analysis.architecture_score,
+      },
+      success: true,
+    });
+
     return corsResponse({
       analysis: {
         id: analysisRow.id,
@@ -229,7 +318,7 @@ ${codeContext}`;
       },
       job_id: job.id,
       model: result.model,
-    });
+    }, getRateLimitHeaders(rateLimit));
   } catch (error: any) {
     console.error("analyze-repo error:", error);
     try {

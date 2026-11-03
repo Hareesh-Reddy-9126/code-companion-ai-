@@ -7,6 +7,9 @@ export const NVIDIA_BASE_URL =
   Deno.env.get("NVIDIA_BASE_URL") ?? "https://integrate.api.nvidia.com/v1";
 export const GITHUB_CLIENT_ID = Deno.env.get("GITHUB_CLIENT_ID") ?? "";
 export const GITHUB_CLIENT_SECRET = Deno.env.get("GITHUB_CLIENT_SECRET") ?? "";
+export const GITHUB_APP_ID = Deno.env.get("GITHUB_APP_ID") ?? "";
+export const GITHUB_APP_PRIVATE_KEY = Deno.env.get("GITHUB_APP_PRIVATE_KEY") ?? "";
+export const GITHUB_APP_WEBHOOK_SECRET = Deno.env.get("GITHUB_APP_WEBHOOK_SECRET") ?? "";
 export const APP_URL = Deno.env.get("APP_URL") ?? "";
 export const ENCRYPTION_KEY = Deno.env.get("ENCRYPTION_KEY") ?? "";
 export const PRIMARY_MODEL =

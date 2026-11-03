@@ -15,6 +15,7 @@ import {
   listGitHubRepos,
 } from "../_shared/github.ts";
 import { encrypt } from "../_shared/crypto.ts";
+import { logAudit, AUDIT_ACTIONS } from "../_shared/audit.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return optionsResponse();
@@ -25,6 +26,14 @@ serve(async (req) => {
   try {
     const userId = await getUserIdFromRequest(req);
     const admin = serviceClient();
+
+    // Get user's org
+    const { data: profile } = await admin
+      .from("profiles")
+      .select("org_id")
+      .eq("user_id", userId)
+      .single();
+    const orgId = profile?.org_id;
 
     const { code } = await req.json();
     if (!code) {
@@ -52,6 +61,7 @@ serve(async (req) => {
       .upsert(
         {
           user_id: userId,
+          org_id: orgId,
           github_username: ghUser.login,
           encrypted_token: encryptedToken,
           updated_at: new Date().toISOString(),
@@ -81,6 +91,7 @@ serve(async (req) => {
         .upsert(
           {
             user_id: userId,
+            org_id: orgId,
             repo_name: repo.full_name,
             repo_url: repo.html_url,
             description: repo.description ?? null,
@@ -95,6 +106,16 @@ serve(async (req) => {
         ),
     );
     await Promise.all(syncPromises);
+
+    await logAudit({
+      org_id: orgId,
+      user_id: userId,
+      action: AUDIT_ACTIONS.GITHUB_CONNECT,
+      resource_type: "github_credentials",
+      resource_id: ghUser.login,
+      metadata: { repo_count: repos.length },
+      success: true,
+    });
 
     return corsResponse({
       success: true,
