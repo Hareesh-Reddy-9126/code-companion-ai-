@@ -19,6 +19,7 @@ import { decrypt } from "../_shared/crypto.ts";
 import { logAudit, AUDIT_ACTIONS } from "../_shared/audit.ts";
 import { checkRateLimit, getRateLimitHeaders, getOrgPlan, PLAN_LIMITS } from "../_shared/rate-limit.ts";
 import { evaluateRules, formatRuleMatchesForPrompt } from "../_shared/rules.ts";
+import { buildCallGraph, getLastAnalysisSnapshot, saveAnalysisSnapshot, getIncrementalPrompt, FileChange } from "../_shared/incremental.ts";
 
 const SYSTEM_PROMPT = `You are a senior staff engineer at a top-tier tech company performing a comprehensive codebase review.
 
@@ -195,12 +196,33 @@ serve(async (req) => {
       .map((f) => `--- ${f.path} ---\n${f.content}`)
       .join("\n\n");
 
-    const userPrompt = `Repository: ${repo.repo_name}
-Language: ${repo.language || "Mixed"}
-Files analyzed: ${files.length}
-${ruleContext}
-
-${codeContext}`;
+    // Check for incremental analysis (only for full_review)
+    let userPrompt: string;
+    let isIncremental = false;
+    if (analysisType === "full_review") {
+      const snapshot = await getLastAnalysisSnapshot(repoId);
+      if (snapshot && snapshot.size > 0) {
+        const [owner, repoName] = repo.repo_name.split("/");
+        const fileChanges: FileChange[] = files.map((f) => ({
+          path: f.path,
+          content: f.content,
+          additions: 0,
+          deletions: 0,
+          status: "modified" as const,
+        }));
+        try {
+          const scope = await buildCallGraph(repoId, owner, repoName, token, fileChanges);
+          userPrompt = getIncrementalPrompt(scope, `Repository: ${repo.repo_name}\nLanguage: ${repo.language || "Mixed"}\nFiles analyzed: ${scope.totalFiles}\n${ruleContext}\n\n${codeContext}`);
+          isIncremental = true;
+        } catch {
+          userPrompt = `Repository: ${repo.repo_name}\nLanguage: ${repo.language || "Mixed"}\nFiles analyzed: ${files.length}\n${ruleContext}\n\n${codeContext}`;
+        }
+      } else {
+        userPrompt = `Repository: ${repo.repo_name}\nLanguage: ${repo.language || "Mixed"}\nFiles analyzed: ${files.length}\n${ruleContext}\n\n${codeContext}`;
+      }
+    } else {
+      userPrompt = `Repository: ${repo.repo_name}\nLanguage: ${repo.language || "Mixed"}\nFiles analyzed: ${files.length}\n${ruleContext}\n\n${codeContext}`;
+    }
 
     // Call NVIDIA AI with automatic model fallback
     let result: { content: string; model: string; usage?: any };
@@ -288,6 +310,11 @@ ${codeContext}`;
       .select()
       .single();
     if (analysisError) throw analysisError;
+
+    // Save snapshot for incremental analysis
+    if (analysisType === "full_review") {
+      await saveAnalysisSnapshot(repoId, files);
+    }
 
     // Mark job complete
     await admin
