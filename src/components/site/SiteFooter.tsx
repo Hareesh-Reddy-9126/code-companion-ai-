@@ -37,7 +37,7 @@ const columns = [
 export function SiteFooter() {
   return (
     <footer className="relative border-t border-border/60 bg-background">
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[52rem] -translate-x-1/2 rounded-full bg-brand/[0.04] blur-3xl" />
+      <div className="pointer-events-none absolute -top-32 left-1/2 h-64 w-[40rem] -translate-x-1/2 rounded-full bg-brand/[0.03] blur-[80px]" />
 
       <div className="container relative">
         <div className="grid gap-12 border-b border-border/60 py-16 md:grid-cols-[1.4fr_1fr_1fr_1fr]">

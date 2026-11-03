@@ -793,12 +793,9 @@ export default function Landing() {
 
 function HeroBackdrop() {
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[1050px] overflow-hidden">
-      <div className="absolute inset-0 grid-lines opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent_78%)]" />
-      <div className="absolute left-1/2 top-[-18rem] h-[34rem] w-[52rem] -translate-x-1/2 rounded-full bg-primary/[0.07] blur-[110px]" />
-      <div className="absolute right-[-12rem] top-[18rem] h-[24rem] w-[34rem] rounded-full bg-info/[0.05] blur-[110px]" />
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-      <div className="absolute left-1/2 top-0 h-full w-px bg-gradient-to-b from-primary/20 via-border/40 to-transparent" />
+    <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[900px] overflow-hidden">
+      <div className="absolute left-1/2 top-[-12rem] h-[34rem] w-[52rem] -translate-x-1/2 rounded-full bg-primary/[0.04] blur-[90px]" />
+      <div className="absolute right-[-10rem] top-[12rem] h-[24rem] w-[34rem] rounded-full bg-info/[0.03] blur-[90px]" />
     </div>
   );
 }
@@ -810,7 +807,6 @@ function HeroBackdrop() {
 function ProductWindow() {
   return (
     <div className="relative mx-auto max-w-[1080px]">
-      <div className="pointer-events-none absolute -inset-x-8 -top-10 h-40 bg-primary/[0.06] blur-3xl" />
 
       {/* Floating annotations */}
       <div className="absolute -right-4 top-24 z-20 hidden w-[210px] rounded-xl border border-border/80 bg-[#0D0F10]/95 p-3 shadow-panel backdrop-blur lg:block">
@@ -835,9 +831,7 @@ function ProductWindow() {
         </div>
       </div>
 
-      <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-[#0A0C0D] shadow-float">
-        <div className="absolute inset-x-0 top-0 z-30 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-16 animate-scan bg-gradient-to-b from-primary/[0.045] to-transparent" />
+      <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-[#0A0C0D] shadow-lg">
 
         {/* window chrome */}
         <div className="flex h-10 items-center gap-3 border-b border-border/60 bg-white/[0.015] px-4">
