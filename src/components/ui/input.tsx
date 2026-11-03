@@ -1,22 +1,93 @@
 import * as React from "react";
-
 import { cn } from "@/lib/utils";
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  error?: boolean;
+  icon?: React.ReactNode;
+  label?: string;
+  hint?: string;
+  errorMessage?: string;
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  (
+    {
+      className,
+      type = "text",
+      error = false,
+      icon,
+      label,
+      hint,
+      errorMessage,
+      disabled,
+      readOnly,
+      id,
+      ...props
+    },
+    ref,
+  ) => {
+    const inputId = id || React.useId();
+
     return (
-      <input
-        type={type}
-        className={cn(
-          "flex h-10 w-full rounded-xl border border-input bg-white/[0.02] px-3.5 py-2 text-base text-foreground ring-offset-background transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground/70 hover:border-muted-foreground/25 focus-visible:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/25 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          className,
+      <div className="field w-full">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="field-label"
+          >
+            {label}
+            {props.required && <span className="field-required" />}
+          </label>
         )}
-        ref={ref}
-        {...props}
-      />
+        <div className="relative">
+          {icon && (
+            <span className="input-icon" aria-hidden="true">
+              {icon}
+            </span>
+          )}
+          <input
+            type={type}
+            id={inputId}
+            className={cn(
+              "input",
+              icon && "input-with-icon",
+              error && "input-error",
+              className,
+            )}
+            ref={ref}
+            disabled={disabled}
+            readOnly={readOnly}
+            aria-invalid={error}
+            aria-describedby={errorMessage ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
+            {...props}
+          />
+        </div>
+        {errorMessage && (
+          <p
+            id={`${inputId}-error`}
+            className="field-error"
+            role="alert"
+          >
+            <svg className="h-3 w-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            {errorMessage}
+          </p>
+        )}
+        {hint && !errorMessage && (
+          <p
+            id={`${inputId}-hint`}
+            className="field-hint"
+          >
+            {hint}
+          </p>
+        )}
+      </div>
     );
   },
 );
+
 Input.displayName = "Input";
 
 export { Input };

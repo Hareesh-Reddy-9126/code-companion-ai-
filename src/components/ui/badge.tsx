@@ -1,32 +1,56 @@
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
-
 import { cn } from "@/lib/utils";
 
-const badgeVariants = cva(
-  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default: "border-primary/25 bg-primary/10 text-primary",
-        secondary: "border-border bg-secondary text-secondary-foreground",
-        destructive: "border-destructive/25 bg-destructive/10 text-destructive",
-        outline: "border-border bg-transparent text-muted-foreground",
-        success: "border-success/25 bg-success/10 text-success",
-        warning: "border-warning/25 bg-warning/10 text-warning",
-        info: "border-info/25 bg-info/10 text-info",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+  variant?: "primary" | "success" | "warning" | "danger" | "neutral" | "outline";
+  size?: "sm" | "md";
+  dot?: boolean;
+}
+
+const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
+  ({ className, variant = "neutral", size = "md", dot = false, children, ...props }, ref) => {
+    return (
+      <span
+        ref={ref}
+        className={cn(
+          "badge inline-flex items-center gap-1.5 font-mono weight-medium uppercase tracking-wider",
+          {
+            "badge-primary": variant === "primary",
+            "badge-success": variant === "success",
+            "badge-warning": variant === "warning",
+            "badge-danger": variant === "danger",
+            "badge-neutral": variant === "neutral",
+            "badge-outline": variant === "outline",
+            "text-2xs": size === "sm",
+            "text-xs": size === "md",
+            "px-2 py-0.5": size === "sm",
+            "px-2.5 py-0.5": size === "md",
+          },
+          className,
+        )}
+        {...props}
+      >
+        {dot && (
+          <span
+            className={cn(
+              "w-1.5 h-1.5 rounded-full flex-shrink-0",
+              {
+                "bg-brand": variant === "primary",
+                "bg-success": variant === "success",
+                "bg-warning": variant === "warning",
+                "bg-danger": variant === "danger",
+                "bg-foreground-subtle": variant === "neutral" || variant === "outline",
+              },
+            )}
+            aria-hidden="true"
+          />
+        )}
+        {children}
+      </span>
+    );
   },
 );
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
+Badge.displayName = "Badge";
 
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return <div className={cn(badgeVariants({ variant }), className)} {...props} />;
-}
-
-export { Badge, badgeVariants };
+export { Badge };

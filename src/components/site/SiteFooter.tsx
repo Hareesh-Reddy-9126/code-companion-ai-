@@ -36,14 +36,14 @@ const columns = [
 
 export function SiteFooter() {
   return (
-    <footer className="relative overflow-hidden border-t border-border/60 bg-[#070808]">
-      <div className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[52rem] -translate-x-1/2 rounded-full bg-primary/[0.055] blur-3xl" />
+    <footer className="relative border-t border-border/60 bg-background">
+      <div className="pointer-events-none absolute -top-40 left-1/2 h-80 w-[52rem] -translate-x-1/2 rounded-full bg-brand/[0.04] blur-3xl" />
 
-      <div className="container-page relative">
+      <div className="container relative">
         <div className="grid gap-12 border-b border-border/60 py-16 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo size="md" />
-            <p className="mt-5 max-w-xs text-[13.5px] leading-6 text-muted-foreground">
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-foreground-muted">
               Code intelligence for teams that would rather ship than argue
               about review comments.
             </p>
@@ -53,14 +53,14 @@ export function SiteFooter() {
                   Start free <ArrowUpRight className="h-3.5 w-3.5" />
                 </Link>
               </Button>
-              <Button variant="outline" size="icon-sm" asChild>
+              <Button variant="ghost" size="sm" className="h-9 w-9" asChild>
                 <a
                   href="https://github.com/Hareesh-Reddy-9126/code-companion-ai-"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="GitHub repository"
                 >
-                  <Github className="h-3.5 w-3.5" />
+                  <Github className="h-4 w-4" />
                 </a>
               </Button>
             </div>
@@ -68,20 +68,20 @@ export function SiteFooter() {
 
           {columns.map((column) => (
             <div key={column.title}>
-              <h3 className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              <h3 className="font-mono text-2xs weight-medium uppercase tracking-wider text-foreground-subtle">
                 {column.title}
               </h3>
               <ul className="mt-4 space-y-2.5">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     {"to" in link && link.to ? (
-                      <Link to={link.to} className="footer-link">
+                      <Link to={link.to} className="text-sm text-foreground-muted hover:text-foreground hover:text-brand transition-colors">
                         {link.label}
                       </Link>
                     ) : (
                       <a
                         href={link.href}
-                        className="footer-link"
+                        className="text-sm text-foreground-muted hover:text-foreground hover:text-brand transition-colors"
                         target={link.href?.startsWith("http") ? "_blank" : undefined}
                         rel={link.href?.startsWith("http") ? "noreferrer" : undefined}
                       >
@@ -95,14 +95,14 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div className="flex flex-col gap-4 py-7 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 py-7 text-xs text-foreground-subtle sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 Code Companion AI. Built in public.</p>
           <div className="flex flex-wrap items-center gap-5">
-            <span className="inline-flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            <span className="inline-flex items-center gap-2 font-mono text-2xs uppercase tracking-wider">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand" />
               Public beta · EU data region
             </span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em]">
+            <span className="font-mono text-2xs uppercase tracking-wider text-foreground-subtle/60">
               Powered by NVIDIA NIM
             </span>
           </div>

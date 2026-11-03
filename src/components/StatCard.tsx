@@ -15,24 +15,21 @@ export function StatCard({ title, value, icon: Icon, change, trend, className }:
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-border/70 bg-card p-5 transition-all duration-300 hover:border-border hover:bg-[hsl(var(--card))]",
+        "stat-card",
         className,
       )}
     >
-      <div className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-primary/[0.04] blur-2xl transition-opacity group-hover:opacity-100" />
       <div className="flex items-start justify-between gap-3">
-        <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
-          {title}
-        </p>
-        <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-border/70 bg-secondary/60 text-muted-foreground">
-          <Icon className="h-3.5 w-3.5" />
+        <p className="stat-label">{title}</p>
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-surface">
+          <Icon className="h-4 w-4 text-foreground-muted" />
         </span>
       </div>
-      <p className="mt-4 text-[28px] font-semibold leading-none tracking-[-0.045em] text-foreground">{value}</p>
+      <p className="stat-value">{value}</p>
       {change && (
-        <div className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          {trend === "up" && <ArrowUpRight className="h-3 w-3 text-primary" />}
-          {trend === "down" && <ArrowDownRight className="h-3 w-3 text-destructive" />}
+        <div className={cn("stat-change", trend === "up" ? "stat-change-positive" : trend === "down" ? "stat-change-negative" : "stat-change-neutral")}>
+          {trend === "up" && <ArrowUpRight className="h-3 w-3" />}
+          {trend === "down" && <ArrowDownRight className="h-3 w-3" />}
           <span>{change}</span>
         </div>
       )}

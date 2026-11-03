@@ -40,13 +40,13 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
+        "fixed inset-x-0 top-0 z-fixed transition-all duration-300",
         solid
-          ? "border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/65"
+          ? "border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/65 shadow-xs"
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <div className="container-page flex h-16 items-center justify-between gap-4">
+      <div className="container flex h-16 items-center justify-between gap-4">
         <Link to="/" className="group inline-flex items-center" aria-label="Code Companion AI home">
           <Logo className="transition-opacity group-hover:opacity-90" />
         </Link>
@@ -56,8 +56,14 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
             <NavLink
               key={item.to}
               to={item.to}
-              className="site-nav-link"
-              data-active={location.pathname === item.to}
+              className={({ isActive }) =>
+                cn(
+                  "site-nav-link px-3 py-2 rounded-md text-sm weight-medium transition-colors",
+                  isActive
+                    ? "text-foreground bg-background-hover"
+                    : "text-foreground-muted hover:text-foreground hover:bg-background-hover",
+                )
+              }
             >
               {item.label}
             </NavLink>
@@ -65,14 +71,14 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <span className="mr-1 hidden items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground xl:inline-flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse-soft" />
+          <span className="mr-1 hidden items-center gap-1.5 font-mono text-2xs uppercase tracking-wider text-foreground-subtle xl:inline-flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse-subtle" />
             Public beta
           </span>
-          <Button variant="ghost" size="sm" className="text-[13px]" asChild>
+          <Button variant="ghost" size="sm" className="text-sm" asChild>
             <Link to="/login">Sign in</Link>
           </Button>
-          <Button size="sm" className="h-9 px-4 text-[13px]" asChild>
+          <Button size="sm" className="h-9 px-4 text-sm" asChild>
             <Link to="/signup">
               Start free <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
@@ -82,7 +88,7 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
         <button
           type="button"
           onClick={() => setMobileOpen((open) => !open)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground md:hidden"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground md:hidden press-scale"
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileOpen}
         >
@@ -97,10 +103,10 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
               <Link
                 key={item.to}
                 to={item.to}
-                className="flex items-center justify-between border-b border-border/40 py-3.5 text-[15px] text-foreground"
+                className="flex items-center justify-between border-b border-border/40 py-3.5 text-base text-foreground hover:bg-background-hover rounded-md px-2"
               >
                 {item.label}
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+                <ArrowUpRight className="h-4 w-4 text-foreground-muted" />
               </Link>
             ))}
           </nav>
@@ -112,8 +118,8 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
               <Link to="/signup">Start free</Link>
             </Button>
           </div>
-          <p className="mt-4 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          <p className="mt-4 flex items-center gap-2 font-mono text-2xs uppercase tracking-wider text-foreground-muted">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand" />
             Free during public beta
           </p>
         </div>
