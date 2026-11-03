@@ -18,6 +18,7 @@ import {
 import { decrypt } from "../_shared/crypto.ts";
 import { logAudit, AUDIT_ACTIONS } from "../_shared/audit.ts";
 import { checkRateLimit, getRateLimitHeaders, getOrgPlan, PLAN_LIMITS } from "../_shared/rate-limit.ts";
+import { evaluateRules, formatRuleMatchesForPrompt } from "../_shared/rules.ts";
 
 const SYSTEM_PROMPT = `You are a senior staff engineer performing a pull request code review.
 
@@ -167,6 +168,13 @@ serve(async (req) => {
       );
     }
 
+    // Evaluate custom organization rules on changed files
+    const changedFiles = filesData
+      .filter((f: any) => f.patch)
+      .map((f: any) => ({ path: f.filename, content: f.patch }));
+    const ruleMatches = orgId ? await evaluateRules(orgId, changedFiles) : [];
+    const ruleContext = formatRuleMatchesForPrompt(ruleMatches);
+
     await admin
       .from("analysis_jobs")
       .update({
@@ -179,6 +187,7 @@ serve(async (req) => {
 PR #${prNumber}: ${prData.title || "Untitled"}
 Files changed: ${filesData.length}
 Additions: ${prData.additions ?? 0} | Deletions: ${prData.deletions ?? 0}
+${ruleContext}
 
 ${diffContext}`;
 

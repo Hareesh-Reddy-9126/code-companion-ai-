@@ -36,6 +36,7 @@ const Features = lazy(() => import("./pages/Features"));
 const AutonomousAgent = lazy(() => import("./pages/AutonomousAgent"));
 const Billing = lazy(() => import("./pages/Billing"));
 const Organization = lazy(() => import("./pages/Organization"));
+const CustomRules = lazy(() => import("./pages/CustomRules"));
 
 const queryClient = new QueryClient();
 
@@ -95,6 +96,7 @@ const App = () => (
                 <Route path="/billing" element={<Billing />} />
                 <Route path="/organization" element={<Organization />} />
                 <Route path="/autonomous-agent" element={<AutonomousAgent />} />
+                <Route path="/custom-rules" element={<CustomRules />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

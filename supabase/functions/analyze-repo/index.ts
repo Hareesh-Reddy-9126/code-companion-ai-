@@ -18,6 +18,7 @@ import {
 import { decrypt } from "../_shared/crypto.ts";
 import { logAudit, AUDIT_ACTIONS } from "../_shared/audit.ts";
 import { checkRateLimit, getRateLimitHeaders, getOrgPlan, PLAN_LIMITS } from "../_shared/rate-limit.ts";
+import { evaluateRules, formatRuleMatchesForPrompt } from "../_shared/rules.ts";
 
 const SYSTEM_PROMPT = `You are a senior staff engineer at a top-tier tech company performing a comprehensive codebase review.
 
@@ -177,6 +178,10 @@ serve(async (req) => {
       );
     }
 
+    // Evaluate custom organization rules
+    const ruleMatches = orgId ? await evaluateRules(orgId, files) : [];
+    const ruleContext = formatRuleMatchesForPrompt(ruleMatches);
+
     await admin
       .from("analysis_jobs")
       .update({
@@ -193,6 +198,7 @@ serve(async (req) => {
     const userPrompt = `Repository: ${repo.repo_name}
 Language: ${repo.language || "Mixed"}
 Files analyzed: ${files.length}
+${ruleContext}
 
 ${codeContext}`;
 
