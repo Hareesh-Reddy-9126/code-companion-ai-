@@ -92,10 +92,10 @@ export default function SharedReport() {
           </p>
           <div className="mt-6 flex justify-center gap-2">
             <Button asChild>
-              <Link to="/">Go home</Link>
+              <Link to="/"><span>Go home</span></Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link to="/signup">Create an account</Link>
+              <Link to="/signup"><span>Create an account</span></Link>
             </Button>
           </div>
         </div>
@@ -137,7 +137,7 @@ export default function SharedReport() {
             </span>
             <Button size="sm" asChild>
               <Link to="/signup">
-                Start free <ArrowRight className="h-3.5 w-3.5" />
+                <span>Start free <ArrowRight className="h-3.5 w-3.5" /></span>
               </Link>
             </Button>
           </div>
@@ -259,7 +259,7 @@ export default function SharedReport() {
               </div>
               <Button size="lg" asChild>
                 <Link to="/signup">
-                  Start free <ArrowRight className="h-4 w-4" />
+                  <span>Start free <ArrowRight className="h-4 w-4" /></span>
                 </Link>
               </Button>
             </div>

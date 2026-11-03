@@ -3,7 +3,8 @@ import { cn } from "@/lib/utils";
 
 interface ScoreRingProps {
   score: number;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | number;
+  strokeWidth?: number;
   label?: string;
   caption?: string;
   className?: string;
@@ -22,14 +23,14 @@ const SIZE_MAP = {
   xl: 140,
 } as const;
 
-const STROKE_WIDTH = 4;
+const DEFAULT_STROKE_WIDTH = 4;
 
-export function ScoreRing({ score, size = "md", label, caption, className }: ScoreRingProps) {
+export function ScoreRing({ score, size = "md", strokeWidth = DEFAULT_STROKE_WIDTH, label, caption, className }: ScoreRingProps) {
   const id = useId().replace(/:/g, "");
   const [progress, setProgress] = useState(0);
   const safeScore = Math.max(0, Math.min(100, Math.round(score)));
-  const pixelSize = SIZE_MAP[size];
-  const radius = (pixelSize - STROKE_WIDTH) / 2;
+  const pixelSize = typeof size === "number" ? size : SIZE_MAP[size];
+  const radius = (pixelSize - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (progress / 100) * circumference;
   const color = scoreColor(safeScore);
@@ -60,7 +61,7 @@ export function ScoreRing({ score, size = "md", label, caption, className }: Sco
           cy={pixelSize / 2}
           r={radius}
           fill="none"
-          strokeWidth={STROKE_WIDTH}
+          strokeWidth={strokeWidth}
         />
         <circle
           className="score-ring-progress"
@@ -68,7 +69,7 @@ export function ScoreRing({ score, size = "md", label, caption, className }: Sco
           cy={pixelSize / 2}
           r={radius}
           fill="none"
-          strokeWidth={STROKE_WIDTH}
+          strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}

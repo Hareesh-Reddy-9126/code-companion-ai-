@@ -23,7 +23,7 @@ export default function NotFound() {
           </Link>
           <Button variant="outline" size="sm" asChild>
             <Link to="/docs">
-              <Terminal className="h-3.5 w-3.5" /> Docs
+              <span><Terminal className="h-3.5 w-3.5" /> Docs</span>
             </Link>
           </Button>
         </div>
@@ -46,12 +46,12 @@ export default function NotFound() {
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button size="lg" asChild>
               <Link to="/">
-                <Home className="h-4 w-4" /> Back to home
+                <span><Home className="h-4 w-4" /> Back to home</span>
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
               <Link to="/dashboard">
-                Open dashboard <ArrowRight className="h-4 w-4" />
+                <span>Open dashboard <ArrowRight className="h-4 w-4" /></span>
               </Link>
             </Button>
           </div>

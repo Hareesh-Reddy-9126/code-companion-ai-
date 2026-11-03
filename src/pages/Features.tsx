@@ -92,12 +92,12 @@ export default function Features() {
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button size="lg" asChild>
                 <Link to="/signup">
-                  Start free <ArrowRight className="h-4 w-4" />
+                  <span>Start free <ArrowRight className="h-4 w-4" /></span>
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link to="/docs">
-                  Read the docs <ArrowUpRight className="h-3.5 w-3.5" />
+                  <span>Read the docs <ArrowUpRight className="h-3.5 w-3.5" /></span>
                 </Link>
               </Button>
             </div>
@@ -371,7 +371,7 @@ export default function Features() {
             <Reveal delay={100} className="flex flex-col gap-3 sm:flex-row lg:flex-col">
               <Button size="lg" asChild>
                 <Link to="/signup">
-                  Start free <ArrowRight className="h-4 w-4" />
+                  <span>Start free <ArrowRight className="h-4 w-4" /></span>
                 </Link>
               </Button>
               <Button
@@ -380,7 +380,7 @@ export default function Features() {
                 className="border-black/20 bg-transparent text-bone-foreground hover:bg-black/[0.05]"
                 asChild
               >
-                <Link to="/pricing">See pricing</Link>
+                <Link to="/pricing"><span>See pricing</span></Link>
               </Button>
             </Reveal>
           </div>

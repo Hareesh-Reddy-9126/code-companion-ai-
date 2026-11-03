@@ -82,7 +82,7 @@ export default function History() {
         actions={
           <Button variant="outline" asChild>
             <Link to="/repositories">
-              Run a new review <ArrowUpRight className="h-3 w-3" />
+              <span>Run a new review <ArrowUpRight className="h-3 w-3" /></span>
             </Link>
           </Button>
         }
@@ -96,7 +96,7 @@ export default function History() {
           action={
             <Button asChild>
               <Link to="/repositories">
-                Go to repositories <ArrowUpRight className="h-3.5 w-3.5" />
+                <span>Go to repositories <ArrowUpRight className="h-3.5 w-3.5" /></span>
               </Link>
             </Button>
           }

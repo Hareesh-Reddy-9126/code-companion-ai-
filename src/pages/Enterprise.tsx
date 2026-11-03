@@ -123,12 +123,12 @@ export default function Enterprise() {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button size="lg" asChild>
                   <a href="mailto:sales@codecompanion.ai?subject=Enterprise%20inquiry">
-                    <Mail className="h-4 w-4" /> Talk to us
+                    <span><Mail className="h-4 w-4" /> Talk to us</span>
                   </a>
                 </Button>
                 <Button size="lg" variant="outline" asChild>
                   <Link to="/security-policy">
-                    <ShieldCheck className="h-4 w-4" /> Security posture
+                    <span><ShieldCheck className="h-4 w-4" /> Security posture</span>
                   </Link>
                 </Button>
               </div>
@@ -337,7 +337,7 @@ export default function Enterprise() {
 
                 <Button size="lg" className="relative mt-7 w-full" asChild>
                   <a href="mailto:sales@codecompanion.ai?subject=Enterprise%20inquiry">
-                    Contact sales <ArrowRight className="h-4 w-4" />
+                    <span>Contact sales <ArrowRight className="h-4 w-4" /></span>
                   </a>
                 </Button>
                 <p className="relative mt-3 text-center font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground/60">
@@ -371,7 +371,7 @@ export default function Enterprise() {
             <Reveal delay={100} className="flex flex-col gap-3 sm:flex-row lg:flex-col">
               <Button size="lg" asChild>
                 <Link to="/signup">
-                  Start free <ArrowRight className="h-4 w-4" />
+                  <span>Start free <ArrowRight className="h-4 w-4" /></span>
                 </Link>
               </Button>
               <Button
@@ -381,7 +381,7 @@ export default function Enterprise() {
                 asChild
               >
                 <Link to="/pricing">
-                  Compare plans <ArrowUpRight className="h-3.5 w-3.5" />
+                  <span>Compare plans <ArrowUpRight className="h-3.5 w-3.5" /></span>
                 </Link>
               </Button>
             </Reveal>

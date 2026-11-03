@@ -111,7 +111,7 @@ export default function CodeReview() {
           action={
             <Button asChild>
               <Link to="/repositories">
-                Go to repositories <ArrowUpRight className="h-3.5 w-3.5" />
+                <span>Go to repositories <ArrowUpRight className="h-3.5 w-3.5" /></span>
               </Link>
             </Button>
           }
@@ -135,7 +135,7 @@ export default function CodeReview() {
           action={
             <Button asChild>
               <Link to="/repositories">
-                Choose a repository <ArrowUpRight className="h-3.5 w-3.5" />
+                <span>Choose a repository <ArrowUpRight className="h-3.5 w-3.5" /></span>
               </Link>
             </Button>
           }
@@ -292,7 +292,7 @@ export default function CodeReview() {
         </p>
         <Button variant="outline" size="sm" asChild>
           <Link to="/autonomous-agent">
-            Open the AI agent <ArrowUpRight className="h-3 w-3" />
+            <span>Open the AI agent <ArrowUpRight className="h-3 w-3" /></span>
           </Link>
         </Button>
       </div>

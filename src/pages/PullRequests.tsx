@@ -96,7 +96,7 @@ export default function PullRequests() {
         actions={
           <Button variant="outline" asChild>
             <Link to="/autonomous-agent">
-              <Bot className="h-3.5 w-3.5" /> Post a fix with the agent
+              <span><Bot className="h-3.5 w-3.5" /> Post a fix with the agent</span>
             </Link>
           </Button>
         }
@@ -183,7 +183,7 @@ export default function PullRequests() {
                   </div>
                   <Button variant="outline" size="sm" asChild>
                     <a href={prUrl} target="_blank" rel="noreferrer">
-                      Open on GitHub <ArrowUpRight className="h-3 w-3" />
+                      <span>Open on GitHub <ArrowUpRight className="h-3 w-3" /></span>
                     </a>
                   </Button>
                 </div>
@@ -287,7 +287,7 @@ export default function PullRequests() {
             </p>
             <Button size="sm" className="mt-4 w-full" asChild>
               <Link to="/autonomous-agent">
-                Dispatch the agent <ArrowUpRight className="h-3 w-3" />
+                <span>Dispatch the agent <ArrowUpRight className="h-3 w-3" /></span>
               </Link>
             </Button>
           </section>

@@ -157,7 +157,7 @@ export default function AutonomousAgent() {
                 </p>
                 <Button size="sm" className="mt-3" asChild>
                   <Link to="/repositories">
-                    Connect a repository <ArrowUpRight className="h-3 w-3" />
+                    <span>Connect a repository <ArrowUpRight className="h-3 w-3" /></span>
                   </Link>
                 </Button>
               </div>

@@ -139,7 +139,7 @@ export default function Billing() {
         actions={
           <Button variant="outline" asChild>
             <Link to="/pricing">
-              Compare plans <ArrowUpRight className="h-3 w-3" />
+              <span>Compare plans <ArrowUpRight className="h-3 w-3" /></span>
             </Link>
           </Button>
         }
@@ -167,7 +167,7 @@ export default function Billing() {
           </div>
           <Button variant="outline" size="sm" asChild>
             <a href="mailto:sales@codecompanion.ai?subject=Plan%20question">
-              Ask about plans <ArrowUpRight className="h-3 w-3" />
+              <span>Ask about plans <ArrowUpRight className="h-3 w-3" /></span>
             </a>
           </Button>
         </div>

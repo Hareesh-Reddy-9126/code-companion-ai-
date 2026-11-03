@@ -84,12 +84,12 @@ export default function Dashboard() {
           <>
             <Button variant="outline" asChild>
               <Link to="/history">
-                <HistoryIcon className="h-3.5 w-3.5" /> History
+                <span><HistoryIcon className="h-3.5 w-3.5" /> History</span>
               </Link>
             </Button>
             <Button asChild>
               <Link to="/repositories">
-                <GitBranch className="h-3.5 w-3.5" /> Analyze a repository
+                <span><GitBranch className="h-3.5 w-3.5" /> Analyze a repository</span>
               </Link>
             </Button>
           </>
@@ -143,7 +143,7 @@ export default function Dashboard() {
               </div>
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/history">
-                  View all <ArrowUpRight className="h-3 w-3" />
+                  <span>View all <ArrowUpRight className="h-3 w-3" /></span>
                 </Link>
               </Button>
             </div>
@@ -256,7 +256,7 @@ function GettingStarted() {
               </div>
               <Button variant="ghost" size="sm" asChild>
                 <Link to={step.href}>
-                  {step.label} <ArrowUpRight className="h-3 w-3" />
+                  <span>{step.label} <ArrowUpRight className="h-3 w-3" /></span>
                 </Link>
               </Button>
             </div>
@@ -347,7 +347,7 @@ function WorkspacePanel({
 
       <Button variant="outline" size="sm" className="mt-4 w-full" asChild>
         <Link to="/settings">
-          Account settings <ArrowUpRight className="h-3 w-3" />
+          <span>Account settings <ArrowUpRight className="h-3 w-3" /></span>
         </Link>
       </Button>
     </section>

@@ -376,7 +376,7 @@ node dist/index.js login`}
                   </div>
                   <Button variant="outline" asChild>
                     <a href="mailto:support@codecompanion.ai?subject=Integration%20question">
-                      Ask a question <ArrowUpRight className="h-3.5 w-3.5" />
+                      <span>Ask a question <ArrowUpRight className="h-3.5 w-3.5" /></span>
                     </a>
                   </Button>
                 </div>

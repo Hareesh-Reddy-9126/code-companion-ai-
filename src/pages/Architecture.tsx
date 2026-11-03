@@ -80,7 +80,7 @@ export default function Architecture() {
         actions={
           <Button variant="outline" asChild>
             <Link to="/repositories">
-              <ScanSearch className="h-3.5 w-3.5" /> Run a review
+              <span><ScanSearch className="h-3.5 w-3.5" /> Run a review</span>
             </Link>
           </Button>
         }
@@ -94,7 +94,7 @@ export default function Architecture() {
           action={
             <Button asChild>
               <Link to="/repositories">
-                Choose a repository <ArrowUpRight className="h-3.5 w-3.5" />
+                <span>Choose a repository <ArrowUpRight className="h-3.5 w-3.5" /></span>
               </Link>
             </Button>
           }

@@ -110,14 +110,12 @@ export default function Landing() {
               <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Button size="lg" className="w-full sm:w-auto" asChild>
                   <Link to="/signup">
-                    Start building free
-                    <ArrowRight className="h-4 w-4" />
+                    <span>Start building free <ArrowRight className="h-4 w-4" /></span>
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
                   <Link to="/features">
-                    <Play className="h-3.5 w-3.5" />
-                    See the platform
+                    <span><Play className="h-3.5 w-3.5" /> See the platform</span>
                   </Link>
                 </Button>
               </div>
@@ -538,7 +536,7 @@ export default function Landing() {
             </div>
             <Button variant="outline" size="sm" asChild>
               <Link to="/pricing">
-                Compare plans <ArrowUpRight className="h-3.5 w-3.5" />
+                <span>Compare plans <ArrowUpRight className="h-3.5 w-3.5" /></span>
               </Link>
             </Button>
           </Reveal>
@@ -644,12 +642,12 @@ export default function Landing() {
               <div className="mt-7 flex flex-wrap gap-3">
                 <Button variant="outline" asChild>
                   <a href="https://github.com/Hareesh-Reddy-9126/code-companion-ai-" target="_blank" rel="noreferrer">
-                    <GitBranch className="h-4 w-4" /> View the repository
+                    <span><GitBranch className="h-4 w-4" /> View the repository</span>
                   </a>
                 </Button>
                 <Button variant="ghost" asChild>
                   <Link to="/docs">
-                    Read the docs <ChevronRight className="h-3.5 w-3.5" />
+                    <span>Read the docs <ChevronRight className="h-3.5 w-3.5" /></span>
                   </Link>
                 </Button>
               </div>
@@ -757,7 +755,7 @@ export default function Landing() {
             <Reveal delay={100} className="flex flex-col gap-3 sm:flex-row lg:flex-col">
               <Button size="lg" asChild>
                 <Link to="/signup">
-                  Start free <ArrowRight className="h-4 w-4" />
+                  <span>Start free <ArrowRight className="h-4 w-4" /></span>
                 </Link>
               </Button>
               <Button
@@ -766,7 +764,7 @@ export default function Landing() {
                 className="border-black/20 bg-transparent text-bone-foreground hover:bg-black/[0.05]"
                 asChild
               >
-                <Link to="/enterprise">Talk to us</Link>
+                <Link to="/enterprise"><span>Talk to us</span></Link>
               </Button>
             </Reveal>
           </div>
