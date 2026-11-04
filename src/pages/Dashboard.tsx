@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowUpRight,
-  Bot,
-  Clock,
   Code2,
   GitBranch,
   History as HistoryIcon,
@@ -14,7 +12,6 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { StatCard } from "@/components/StatCard";
 import { PageHeader } from "@/components/app/PageHeader";
 
 interface AnalysisWithRepo {
@@ -63,7 +60,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+        <Loader2 className="h-5 w-5 animate-spin text-brand" />
       </div>
     );
   }
@@ -71,7 +68,7 @@ export default function Dashboard() {
   const firstName = profile?.name?.split(" ")[0] || user?.email?.split("@")[0];
 
   return (
-    <div className="animate-slide-in">
+    <div className="relative">
       <PageHeader
         group="Workspace"
         title="Dashboard"
@@ -96,67 +93,63 @@ export default function Dashboard() {
         }
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCardLite
           title="Repositories"
           value={repoCount}
           icon={GitBranch}
           change={repoCount === 0 ? "Connect GitHub to begin" : "Connected to your account"}
         />
-        <StatCard
+        <StatCardLite
           title="Avg quality"
           value={analyses.length ? avgQuality : "—"}
           icon={Code2}
           change={analyses.length ? "Across the last 10 analyses" : "No analyses yet"}
         />
-        <StatCard
+        <StatCardLite
           title="Security"
           value={analyses.length ? avgSecurity : "—"}
           icon={Shield}
           change={analyses.length ? "Average security score" : "No analyses yet"}
         />
-        <StatCard
+        <StatCardLite
           title="Analyses"
           value={analysisCount}
-          icon={Clock}
+          icon={Sparkles}
           change="All time, on demand"
         />
       </div>
 
       {analyses.length === 0 ? (
-        <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-          <GettingStarted />
-          <WorkspacePanel
-            githubUsername={profile?.github_username ?? null}
-            workspaceName={profile?.name || user?.email || "Personal workspace"}
-          />
-        </div>
+        <GettingStarted />
       ) : (
-        <div className="mt-4 grid gap-4 lg:grid-cols-3">
-          <section className="panel overflow-hidden lg:col-span-2">
-            <div className="flex items-center justify-between border-b border-border/60 px-5 py-4">
+        <div className="mt-8 grid gap-8 lg:grid-cols-3">
+          <section className="lg:col-span-2">
+            <div className="flex items-center justify-between border-b border-border px-0 py-4 mb-4">
               <div>
-                <p className="text-[13.5px] font-medium text-foreground">Recent analyses</p>
-                <p className="mt-0.5 text-[11.5px] text-muted-foreground">
+                <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                  Recent analyses
+                </p>
+                <p className="mt-0.5 text-[12px] font-medium text-foreground">
                   Reports are stored with the code snapshot used for the review.
                 </p>
               </div>
-              <Button variant="ghost" size="sm" asChild>
+              <Button variant="outline" size="sm" asChild>
                 <Link to="/history">
                   <span>View all <ArrowUpRight className="h-3 w-3" /></span>
                 </Link>
               </Button>
             </div>
 
-            <div className="divide-y divide-border/50">
+            <div className="divide-y divide-border">
               {analyses.slice(0, 6).map((analysis) => (
                 <button
                   key={analysis.id}
                   type="button"
                   onClick={() => navigate(`/code-review?analysisId=${analysis.id}`)}
-                  className="group flex w-full items-center gap-3.5 px-5 py-3.5 text-left transition-colors hover:bg-white/[0.02]"
+                  className="group flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-hover"
                 >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-secondary/50 text-muted-foreground transition-colors group-hover:text-primary">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors group-hover:text-brand">
                     <GitBranch className="h-3.5 w-3.5" />
                   </span>
                   <span className="min-w-0 flex-1">
@@ -178,9 +171,9 @@ export default function Dashboard() {
                     </span>
                   </span>
                   <span
-                    className={`w-9 text-right font-mono text-[12px] font-medium ${
+                    className={`w-8 text-right font-mono text-[12px] font-medium ${
                       (analysis.quality_score || 0) >= 80
-                        ? "text-primary"
+                        ? "text-brand"
                         : (analysis.quality_score || 0) >= 60
                           ? "text-warning"
                           : "text-destructive"
@@ -194,7 +187,7 @@ export default function Dashboard() {
             </div>
           </section>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-8">
             <QualityTrend analyses={analyses} />
             <WorkspacePanel
               githubUsername={profile?.github_username ?? null}
@@ -203,6 +196,33 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function StatCardLite({
+  title,
+  value,
+  icon: Icon,
+  change,
+}: {
+  title: string;
+  value: number | string;
+  icon: React.ComponentType<{ className?: string }>;
+  change: string;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Icon className="h-4 w-4 text-brand" />
+        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
+          {title}
+        </span>
+      </div>
+      <div className="text-[32px] font-medium leading-none tracking-tight text-foreground mb-2">
+        {value}
+      </div>
+      <p className="text-sm text-muted-foreground">{change}</p>
     </div>
   );
 }
@@ -230,38 +250,35 @@ function GettingStarted() {
   ];
 
   return (
-    <section className="panel relative overflow-hidden p-6">
-      <div className="pointer-events-none absolute inset-0 dot-grid opacity-30 mask-fade-y" />
-      <div className="relative">
-        <span className="chip-signal">
-          <Sparkles className="h-3 w-3" /> First run
-        </span>
-        <h2 className="mt-4 text-[20px] font-semibold tracking-[-0.035em] text-foreground">
-          Three steps to your first review.
-        </h2>
-        <p className="mt-1.5 max-w-[46ch] text-[12.5px] leading-6 text-muted-foreground">
-          No pipeline to install and no webhook to configure. Connect a
-          repository and request an analysis when you want one.
-        </p>
+    <section className="mt-8 rounded-xl border border-border bg-card p-8">
+      <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-brand">
+        <Sparkles className="h-3 w-3" /> First run
+      </span>
+      <h2 className="mt-4 text-[20px] font-semibold tracking-[-0.03em] text-foreground">
+        Three steps to your first review.
+      </h2>
+      <p className="mt-2 max-w-[46ch] text-sm leading-relaxed text-muted-foreground">
+        No pipeline to install and no webhook to configure. Connect a
+        repository and request an analysis when you want one.
+      </p>
 
-        <div className="mt-6 space-y-px overflow-hidden rounded-xl border border-border/70 bg-border/50">
-          {steps.map((step, index) => (
-            <div key={step.title} className="flex items-center gap-4 bg-card px-4 py-3.5">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border/70 bg-secondary/60 font-mono text-[10px] text-muted-foreground">
-                {index + 1}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-[12.5px] font-medium text-foreground">{step.title}</p>
-                <p className="mt-0.5 text-[11.5px] leading-5 text-muted-foreground">{step.copy}</p>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <Link to={step.href}>
-                  <span>{step.label} <ArrowUpRight className="h-3 w-3" /></span>
-                </Link>
-              </Button>
+      <div className="mt-6 space-y-3">
+        {steps.map((step, index) => (
+          <div key={step.title} className="flex items-center gap-3 rounded-lg border border-border bg-card p-4">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-surface font-mono text-[10px] text-muted-foreground">
+              {index + 1}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[12.5px] font-medium text-foreground">{step.title}</p>
+              <p className="mt-0.5 text-[11px] leading-5 text-muted-foreground">{step.copy}</p>
             </div>
-          ))}
-        </div>
+            <Button variant="outline" size="sm" asChild>
+              <Link to={step.href}>
+                <span>{step.label} <ArrowUpRight className="h-3 w-3" /></span>
+              </Link>
+            </Button>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -274,15 +291,15 @@ function QualityTrend({ analyses }: { analyses: AnalysisWithRepo[] }) {
     : 0;
 
   return (
-    <section className="panel p-5">
-      <div className="flex items-start justify-between">
+    <section className="mt-8 rounded-xl border border-border bg-card p-6">
+      <div className="flex items-start justify-between mb-4">
         <div>
-          <p className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
             Quality trend
           </p>
           <p className="mt-1 text-[12px] text-muted-foreground">Most recent {series.length} reviews</p>
         </div>
-        <span className="font-mono text-[13px] text-primary">{average}</span>
+        <span className="font-mono text-[13px] text-brand">{average}</span>
       </div>
 
       <div className="mt-5 flex h-28 items-end gap-1.5">
@@ -292,7 +309,7 @@ function QualityTrend({ analyses }: { analyses: AnalysisWithRepo[] }) {
             <div
               key={analysis.id}
               title={`${analysis.repositories?.repo_name || "Repository"} — ${score}/100`}
-              className="flex-1 rounded-t-[3px] bg-primary/20 transition-colors hover:bg-primary/35"
+              className="flex-1 rounded-t-[3px] bg-brand/10 transition-colors hover:bg-brand/20"
               style={{ height: `${Math.max(6, score)}%` }}
             />
           );
@@ -321,13 +338,13 @@ function WorkspacePanel({
   workspaceName: string;
 }) {
   return (
-    <section className="panel p-5">
-      <p className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground">
+    <section className="mt-8 rounded-xl border border-border bg-card p-6">
+      <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
         Workspace
       </p>
       <p className="mt-2 truncate text-[13px] font-medium text-foreground">{workspaceName}</p>
 
-      <div className="mt-4 space-y-2.5">
+      <div className="mt-5 space-y-3">
         <StatusRow
           label="GitHub"
           value={githubUsername ? `@${githubUsername}` : "Not connected"}
@@ -337,15 +354,15 @@ function WorkspacePanel({
         <StatusRow label="Data region" value="EU · eu-north-1" />
       </div>
 
-      <div className="mt-4 flex items-start gap-2 rounded-lg border border-border/60 bg-white/[0.015] p-3">
-        <Bot className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-        <p className="text-[10.5px] leading-5 text-muted-foreground">
+      <div className="mt-5 flex items-start gap-2 rounded-lg border border-border bg-card p-3">
+        <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand" />
+        <p className="text-[10px] leading-5 text-muted-foreground">
           The agent posts fix suggestions as a PR comment. It never pushes a
           commit on its own.
         </p>
       </div>
 
-      <Button variant="outline" size="sm" className="mt-4 w-full" asChild>
+      <Button variant="outline" size="sm" className="mt-5 w-full" asChild>
         <Link to="/settings">
           <span>Account settings <ArrowUpRight className="h-3 w-3" /></span>
         </Link>
@@ -365,10 +382,10 @@ function StatusRow({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-[11.5px] text-muted-foreground">{label}</span>
+      <span className="text-[11px] text-muted-foreground">{label}</span>
       <span
         className={`truncate font-mono text-[10px] ${
-          tone === "good" ? "text-primary" : tone === "warning" ? "text-warning" : "text-foreground/75"
+          tone === "good" ? "text-brand" : tone === "warning" ? "text-warning" : "text-foreground/75"
         }`}
       >
         {value}
@@ -378,14 +395,8 @@ function StatusRow({
 }
 
 function formatDate(value: string) {
-  const date = new Date(value);
-  const diff = Date.now() - date.getTime();
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days < 7) return `${days}d ago`;
-  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return new Date(value).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
 }

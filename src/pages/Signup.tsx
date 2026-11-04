@@ -1,13 +1,11 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Check, Loader2, Lock, Mail, User } from "lucide-react";
+import { ArrowRight, Loader2, Lock, Mail, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthField } from "@/components/auth/AuthField";
-
-const strengthLabels = ["Too short", "Weak", "Fair", "Strong", "Excellent"];
 
 function scorePassword(password: string) {
   if (!password) return 0;
@@ -29,7 +27,7 @@ export default function Signup() {
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const strength = useMemo(() => scorePassword(password), [password]);
+  const strength = scorePassword(password);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -68,7 +66,7 @@ export default function Signup() {
       footer={
         <>
           Already have an account?{" "}
-          <Link to="/login" className="font-medium text-primary hover:underline">
+          <Link to="/login" className="font-medium text-brand hover:underline">
             Sign in
           </Link>
         </>
@@ -78,7 +76,8 @@ export default function Signup() {
         <AuthField
           icon={User}
           label="Full name"
-          placeholder="Ada Lovelace"
+          type="text"
+          placeholder="Jane Doe"
           autoComplete="name"
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -94,61 +93,47 @@ export default function Signup() {
           onChange={(event) => setEmail(event.target.value)}
           required
         />
-        <div>
-          <AuthField
-            icon={Lock}
-            label="Password"
-            type="password"
-            placeholder="At least 6 characters"
-            autoComplete="new-password"
-            hint={password ? strengthLabels[strength] : "min 6 characters"}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-          <div className="mt-2 flex gap-1" aria-hidden="true">
-            {[0, 1, 2, 3].map((index) => (
-              <span
-                key={index}
-                className={`h-0.5 flex-1 rounded-full transition-colors ${
-                  password && index < strength
-                    ? strength <= 1
-                      ? "bg-destructive/70"
-                      : strength === 2
-                        ? "bg-warning/70"
-                        : "bg-primary/80"
-                    : "bg-border"
-                }`}
+        <AuthField
+          icon={Lock}
+          label="Password"
+          type="password"
+          placeholder="Your password"
+          autoComplete="new-password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+        />
+        {strength > 0 && (
+          <div className="flex items-center gap-2 mt-1">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
+              Strength
+            </span>
+            <div className="flex-1 h-1 w-full overflow-hidden rounded-full bg-border">
+              <div
+                className={`h-full rounded-full bg-brand transition-all duration-300 ${strength === 4 ? "w-full" : ""}`}
+                style={{ width: `${(strength / 4) * 100}%` }}
               />
-            ))}
+            </div>
+            <span className="font-mono text-[10px] text-muted-foreground">
+              {strength === 0 ? "" : ["Too short", "Weak", "Fair", "Strong", "Excellent"][strength]}
+            </span>
           </div>
+        )}
+        <div className="flex items-start gap-2">
+          <input
+            id="terms"
+            type="checkbox"
+            className="h-4 w-4 rounded border-border text-brand focus:ring-brand checked:bg-brand checked:border-brand"
+            checked={accepted}
+            onChange={() => setAccepted((prev) => !prev)}
+          />
+          <label htmlFor="terms" className="text-sm text-foreground-muted leading-relaxed">
+            I accept the <Link to="/terms" className="text-brand hover:underline">Terms of Service</Link> and{" "}
+            <Link to="/privacy" className="text-brand hover:underline">Privacy Policy</Link>.
+          </label>
         </div>
 
-        <label className="flex cursor-pointer items-start gap-2.5 pt-1 text-[11.5px] leading-5 text-muted-foreground">
-          <span className="relative mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center">
-            <input
-              type="checkbox"
-              checked={accepted}
-              onChange={(event) => setAccepted(event.target.checked)}
-              className="peer h-4 w-4 appearance-none rounded border border-input bg-white/[0.02] transition-colors checked:border-primary checked:bg-primary"
-              required
-            />
-            <Check className="pointer-events-none absolute h-2.5 w-2.5 text-primary-foreground opacity-0 peer-checked:opacity-100" />
-          </span>
-          <span>
-            I agree to the{" "}
-            <Link to="/terms" className="text-foreground/85 underline decoration-border underline-offset-4 hover:decoration-primary">
-              Terms
-            </Link>{" "}
-            and{" "}
-            <Link to="/privacy" className="text-foreground/85 underline decoration-border underline-offset-4 hover:decoration-primary">
-              Privacy Policy
-            </Link>
-            .
-          </span>
-        </label>
-
-        <Button type="submit" size="lg" className="w-full" disabled={loading}>
+        <Button type="submit" size="lg" className="mt-2 w-full" disabled={loading}>
           {loading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" /> Creating account
@@ -161,8 +146,11 @@ export default function Signup() {
         </Button>
       </form>
 
-      <p className="mt-5 text-center font-mono text-[9px] uppercase leading-5 tracking-[0.12em] text-muted-foreground/50">
-        Email confirmation may be required · GitHub is connected after signup
+      <p className="mt-6 text-center text-[11px] leading-5 text-muted-foreground/60">
+        Already have an account?{" "}
+        <Link to="/login" className="text-brand hover:underline">
+          Sign in
+        </Link>
       </p>
     </AuthShell>
   );

@@ -36,16 +36,13 @@ const columns = [
 
 export function SiteFooter() {
   return (
-    <footer className="relative border-t border-border/60 bg-background">
-      <div className="pointer-events-none absolute -top-32 left-1/2 h-64 w-[40rem] -translate-x-1/2 rounded-full bg-brand/[0.03] blur-[80px]" />
-
-      <div className="container relative">
-        <div className="grid gap-12 border-b border-border/60 py-16 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer className="border-t border-border bg-background">
+      <div className="container relative py-12">
+        <div className="grid gap-8 border-b border-border pb-8 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Logo size="md" />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-foreground-muted">
-              Code intelligence for teams that would rather ship than argue
-              about review comments.
+              Code intelligence for teams that ship.
             </p>
             <div className="mt-6 flex items-center gap-2">
               <Button size="sm" asChild>
@@ -68,20 +65,23 @@ export function SiteFooter() {
 
           {columns.map((column) => (
             <div key={column.title}>
-              <h3 className="font-mono text-2xs weight-medium uppercase tracking-wider text-foreground-subtle">
+              <h3 className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 {column.title}
               </h3>
-              <ul className="mt-4 space-y-2.5">
+              <ul className="mt-4 space-y-3">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     {"to" in link && link.to ? (
-                      <Link to={link.to} className="text-sm text-foreground-muted hover:text-foreground hover:text-brand transition-colors">
+                      <Link
+                        to={link.to}
+                        className="text-sm text-foreground-muted hover:text-brand transition-colors"
+                      >
                         {link.label}
                       </Link>
                     ) : (
                       <a
                         href={link.href}
-                        className="text-sm text-foreground-muted hover:text-foreground hover:text-brand transition-colors"
+                        className="text-sm text-foreground-muted hover:text-brand transition-colors"
                         target={link.href?.startsWith("http") ? "_blank" : undefined}
                         rel={link.href?.startsWith("http") ? "noreferrer" : undefined}
                       >
@@ -95,14 +95,14 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div className="flex flex-col gap-4 py-7 text-xs text-foreground-subtle sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-4 pt-8 border-t border-border text-xs text-foreground-subtle sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 Code Companion AI. Built in public.</p>
           <div className="flex flex-wrap items-center gap-5">
-            <span className="inline-flex items-center gap-2 font-mono text-2xs uppercase tracking-wider">
+            <span className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider">
               <span className="h-1.5 w-1.5 rounded-full bg-brand" />
               Public beta · EU data region
             </span>
-            <span className="font-mono text-2xs uppercase tracking-wider text-foreground-subtle/60">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
               Powered by NVIDIA NIM
             </span>
           </div>

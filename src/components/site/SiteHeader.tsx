@@ -42,11 +42,11 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
       className={cn(
         "fixed inset-x-0 top-0 z-fixed transition-all duration-300",
         solid
-          ? "border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/65 shadow-xs"
+          ? "border-b border-border bg-background/90 backdrop-blur-sm shadow-xs"
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <div className="container flex h-16 items-center justify-between gap-4">
+      <div className="container flex h-14 items-center justify-between gap-4">
         <Link to="/" className="group inline-flex items-center" aria-label="Code Companion AI home">
           <Logo className="transition-opacity group-hover:opacity-90" />
         </Link>
@@ -58,10 +58,10 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  "site-nav-link px-3 py-2 rounded-md text-sm weight-medium transition-colors",
+                  "px-3 py-2 rounded-md text-sm font-medium transition-colors",
                   isActive
-                    ? "text-foreground bg-background-hover"
-                    : "text-foreground-muted hover:text-foreground hover:bg-background-hover",
+                    ? "text-brand bg-brand/10"
+                    : "text-foreground-muted hover:text-foreground hover:bg-surface",
                 )
               }
             >
@@ -70,15 +70,15 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 md:flex">
-          <span className="mr-1 hidden items-center gap-1.5 font-mono text-2xs uppercase tracking-wider text-foreground-subtle xl:inline-flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse-subtle" />
+        <div className="hidden items-center gap-3 md:flex">
+          <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand animate-pulse" />
             Public beta
           </span>
-          <Button variant="ghost" size="sm" className="text-sm" asChild>
+          <Button variant="ghost" size="sm" asChild>
             <Link to="/login">Sign in</Link>
           </Button>
-          <Button size="sm" className="h-9 px-4 text-sm" asChild>
+          <Button size="sm" className="h-9 px-5" asChild>
             <Link to="/signup">
               Start free <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
@@ -88,7 +88,7 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
         <button
           type="button"
           onClick={() => setMobileOpen((open) => !open)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground md:hidden press-scale"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border text-foreground md:hidden"
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileOpen}
         >
@@ -97,30 +97,30 @@ export function SiteHeader({ transparent = false }: { transparent?: boolean }) {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-border/60 bg-background/95 px-5 pb-6 pt-4 backdrop-blur-xl md:hidden">
+        <div className="border-t border-border bg-background/95 px-5 pb-6 pt-4 backdrop-blur-sm md:hidden">
           <nav className="flex flex-col" aria-label="Mobile">
             {navItems.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
-                className="flex items-center justify-between border-b border-border/40 py-3.5 text-base text-foreground hover:bg-background-hover rounded-md px-2"
+                className="flex items-center justify-between border-b border-border/50 py-3 text-sm text-foreground hover:text-brand rounded-md px-2"
               >
                 {item.label}
-                <ArrowUpRight className="h-4 w-4 text-foreground-muted" />
+                <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground" />
               </Link>
             ))}
           </nav>
           <div className="mt-5 grid grid-cols-2 gap-2">
-            <Button variant="outline" asChild>
+            <Button variant="outline" size="sm" asChild>
               <Link to="/login">Sign in</Link>
             </Button>
-            <Button asChild>
+            <Button size="sm" asChild>
               <Link to="/signup">Start free</Link>
             </Button>
           </div>
-          <p className="mt-4 flex items-center gap-2 font-mono text-2xs uppercase tracking-wider text-foreground-muted">
+          <p className="mt-4 flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-            Free during public beta
+            Public beta
           </p>
         </div>
       )}

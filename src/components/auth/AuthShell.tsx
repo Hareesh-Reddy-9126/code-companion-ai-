@@ -21,38 +21,34 @@ const defaultPoints = [
 export function AuthShell({ eyebrow, title, description, children, footer, points = defaultPoints }: AuthShellProps) {
   return (
     <div className="relative min-h-screen bg-background">
-      <div className="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="grid min-h-screen lg:grid-cols-[1fr_1fr]">
         {/* Brand panel */}
-        <aside className="relative hidden overflow-hidden border-r border-border/60 bg-[#08090A] lg:flex lg:flex-col">
-          <div className="pointer-events-none absolute inset-0 grid-lines opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent_90%)]" />
-          <div className="pointer-events-none absolute -left-24 top-1/3 h-[26rem] w-[26rem] rounded-full bg-primary/[0.07] blur-[110px]" />
-          <div className="pointer-events-none absolute -right-20 bottom-0 h-[20rem] w-[20rem] rounded-full bg-info/[0.04] blur-[100px]" />
-
-          <div className="relative flex items-center justify-between px-10 py-8">
+        <aside className="relative hidden border-r border-border bg-surface lg:flex lg:flex-col">
+          <div className="relative flex items-center justify-between px-8 py-8">
             <Link to="/" aria-label="Code Companion AI home">
               <Logo />
             </Link>
-            <span className="flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand" />
               Public beta
             </span>
           </div>
 
-          <div className="relative flex flex-1 flex-col justify-center px-10 py-10 xl:px-16">
+          <div className="relative flex flex-1 flex-col justify-center px-8 py-10 xl:px-16">
             <p className="eyebrow">Code intelligence</p>
-            <h2 className="display-md mt-5 max-w-[14ch] text-foreground">
+            <h2 className="text-h2 mt-4 max-w-[14ch] text-foreground">
               Review like you have a{" "}
-              <span className="font-display italic text-primary">staff engineer</span> on call.
+              <span className="font-medium text-brand">staff engineer</span> on call.
             </h2>
-            <p className="mt-5 max-w-[42ch] text-[13.5px] leading-6 text-muted-foreground">
+            <p className="mt-6 max-w-[42ch] text-sm leading-relaxed text-muted-foreground">
               Code Companion turns a repository into a review you can act on:
               scores, findings and a fix proposal tied to the exact line.
             </p>
 
-            <ul className="mt-7 space-y-3">
+            <ul className="mt-8 space-y-4">
               {points.map((point) => (
-                <li key={point} className="flex items-start gap-2.5 text-[12.5px] leading-5 text-muted-foreground">
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-primary">
+                <li key={point} className="flex items-start gap-3 text-sm leading-relaxed text-muted-foreground">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-lg border border-brand bg-brand/10 text-brand">
                     <Check className="h-2.5 w-2.5" />
                   </span>
                   {point}
@@ -61,33 +57,33 @@ export function AuthShell({ eyebrow, title, description, children, footer, point
             </ul>
 
             {/* Product vignette */}
-            <div className="mt-10 overflow-hidden rounded-2xl border border-border/70 bg-[#0A0C0D] shadow-panel">
-              <div className="flex items-center justify-between border-b border-border/60 px-4 py-2.5">
-                <span className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">
-                  <GitPullRequest className="h-3 w-3 text-primary" /> review / 184
+            <div className="mt-10 overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+              <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                <span className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+                  <GitPullRequest className="h-3 w-3 text-brand" /> review / 184
                 </span>
-                <span className="rounded-full border border-success/25 bg-success/10 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.1em] text-success">
+                <span className="rounded-full border border-brand/25 bg-brand/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider text-brand">
                   complete
                 </span>
               </div>
-              <div className="flex items-center gap-5 p-4">
+              <div className="flex items-center gap-5 p-5">
                 <ScoreRing score={86} size={72} strokeWidth={5} label="quality" />
-                <div className="min-w-0 flex-1 space-y-2">
-                  <div className="flex items-center gap-2 rounded-lg border border-warning/20 bg-warning/[0.04] px-2.5 py-1.5">
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" />
-                    <span className="truncate font-mono text-[9px] text-foreground/75">
+                <div className="min-w-0 flex-1 space-y-3">
+                  <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand/10" />
+                    <span className="truncate font-mono text-[10px] text-foreground/75">
                       webhook signature not verified
                     </span>
-                    <span className="ml-auto font-mono text-[8px] text-muted-foreground/50">stripe.ts:42</span>
+                    <span className="ml-auto font-mono text-[9px] text-muted-foreground/50">stripe.ts:42</span>
                   </div>
-                  <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-white/[0.02] px-2.5 py-1.5">
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-info" />
-                    <span className="truncate font-mono text-[9px] text-foreground/75">
+                  <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2">
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand/10" />
+                    <span className="truncate font-mono text-[10px] text-foreground/75">
                       retry loop has no backoff cap
                     </span>
-                    <span className="ml-auto font-mono text-[8px] text-muted-foreground/50">retry.ts:18</span>
+                    <span className="ml-auto font-mono text-[9px] text-muted-foreground/50">retry.ts:18</span>
                   </div>
-                  <div className="flex items-center gap-1.5 pt-0.5 font-mono text-[8.5px] text-primary">
+                  <div className="flex items-center gap-1.5 pt-0.5 font-mono text-[9px] uppercase tracking-wider text-brand">
                     <Sparkles className="h-2.5 w-2.5" /> 2 fix suggestions ready
                   </div>
                 </div>
@@ -95,7 +91,7 @@ export function AuthShell({ eyebrow, title, description, children, footer, point
             </div>
           </div>
 
-          <div className="relative flex items-center justify-between border-t border-border/60 px-10 py-5 font-mono text-[9px] uppercase tracking-[0.12em] text-muted-foreground/60">
+          <div className="relative flex items-center justify-between border-t border-border px-8 py-5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground/60">
             <span className="flex items-center gap-1.5">
               <Terminal className="h-3 w-3" /> same pipeline as the CLI
             </span>
@@ -120,13 +116,13 @@ export function AuthShell({ eyebrow, title, description, children, footer, point
           <div className="flex flex-1 items-center justify-center px-6 pb-14 pt-4">
             <div className="w-full max-w-[380px]">
               <p className="eyebrow">{eyebrow}</p>
-              <h1 className="mt-3 text-[30px] font-semibold leading-tight tracking-[-0.045em] text-foreground sm:text-[32px]">
+              <h1 className="mt-4 text-[30px] font-semibold leading-tight tracking-[-0.04em] text-foreground sm:text-[32px]">
                 {title}
               </h1>
-              <p className="mt-2.5 text-[13px] leading-6 text-muted-foreground">{description}</p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{description}</p>
 
-              <div className="mt-7">{children}</div>
-              <div className="mt-6 text-center text-[12.5px] text-muted-foreground">{footer}</div>
+              <div className="mt-8">{children}</div>
+              <div className="mt-6 text-center text-[12px] text-muted-foreground">{footer}</div>
 
               <p className="mt-8 text-center font-mono text-[9px] uppercase leading-5 tracking-[0.12em] text-muted-foreground/50">
                 Free during public beta · no card · no automatic charges

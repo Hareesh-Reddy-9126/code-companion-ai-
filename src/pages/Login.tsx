@@ -35,7 +35,7 @@ export default function Login() {
       footer={
         <>
           New to Code Companion?{" "}
-          <Link to="/signup" className="font-medium text-primary hover:underline">
+          <Link to="/signup" className="font-medium text-brand hover:underline">
             Create an account
           </Link>
         </>
@@ -76,9 +76,9 @@ export default function Login() {
         </Button>
       </form>
 
-      <p className="mt-5 text-center text-[11px] leading-5 text-muted-foreground/70">
+      <p className="mt-6 text-center text-[11px] leading-5 text-muted-foreground/60">
         Trouble signing in? Email{" "}
-        <a href="mailto:support@codecompanion.ai" className="text-foreground/80 underline decoration-border underline-offset-4 hover:decoration-primary">
+        <a href="mailto:support@codecompanion.ai" className="text-brand hover:underline">
           support@codecompanion.ai
         </a>
         . Automated password reset is not enabled during the beta.

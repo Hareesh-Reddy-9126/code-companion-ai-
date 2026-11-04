@@ -83,7 +83,7 @@ export default function CodeReview() {
       await navigator.clipboard.writeText(url);
       toast({
         title: "Share link copied",
-        description: "Anyone with the link can read this report. It no longer requires a sign-in.",
+        description: "Anyone with the link can read this report.",
       });
     } catch (error: any) {
       toast({ title: "Could not create the link", description: error.message, variant: "destructive" });
@@ -95,19 +95,19 @@ export default function CodeReview() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-24">
-        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+        <Loader2 className="h-5 w-5 animate-spin text-brand" />
       </div>
     );
   }
 
   if (analysisId && !analysis) {
     return (
-      <div className="animate-slide-in">
+      <div className="relative">
         <PageHeader group="Workspace" title="AI code review" />
         <EmptyState
           icon={FileSearch}
           title="Report not found"
-          description="This analysis does not exist, was deleted, or belongs to another account. Run a new review from your repositories."
+          description="This analysis does not exist, was deleted, or belongs to another account."
           action={
             <Button asChild>
               <Link to="/repositories">
@@ -122,7 +122,7 @@ export default function CodeReview() {
 
   if (!analysis) {
     return (
-      <div className="animate-slide-in">
+      <div className="relative">
         <PageHeader
           group="Workspace"
           title="AI code review"
@@ -131,7 +131,7 @@ export default function CodeReview() {
         <EmptyState
           icon={Code2}
           title="No analysis selected"
-          description="Open a repository and choose Run review. Reports appear here and in History once the analysis finishes."
+          description="Open a repository and choose Run review. Reports appear here once the analysis finishes."
           action={
             <Button asChild>
               <Link to="/repositories">
@@ -155,14 +155,14 @@ export default function CodeReview() {
   const overall = Math.round(scores.reduce((sum, score) => sum + score.value, 0) / scores.length);
 
   return (
-    <div className="animate-slide-in">
+    <div className="relative">
       <PageHeader
         group="Workspace"
         title="AI code review"
-        description={`${name} · ${formatType(analysis.analysis_type)} · ${new Date(analysis.created_at).toLocaleString(undefined, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}`}
+        description={`${name} · ${formatType(analysis.analysis_type)} · ${new Date(analysis.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`}
         actions={
           <>
-            <Button variant="ghost" onClick={() => navigate(-1)}>
+            <Button variant="outline" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-3.5 w-3.5" /> Back
             </Button>
             <Button variant="outline" onClick={() => navigate("/repositories")}>
@@ -176,35 +176,36 @@ export default function CodeReview() {
         }
       />
 
-      <section className="panel overflow-hidden">
-        <div className="flex flex-col gap-6 border-b border-border/60 p-5 sm:p-6 lg:flex-row lg:items-center">
+      <section className="mt-8 rounded-xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex flex-col lg:flex-row lg:items-center gap-6 border-b border-border pb-6">
           <div className="flex items-center gap-5">
             <ScoreRing score={overall} size={104} strokeWidth={7} label="overall" />
             <div>
-              <p className="font-mono text-[9.5px] uppercase tracking-[0.16em] text-muted-foreground">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                 Overall assessment
               </p>
-              <p className="mt-1.5 text-[19px] font-semibold tracking-[-0.035em] text-foreground">
+              <p className="mt-1.5 text-[20px] font-semibold tracking-[-0.03em] text-foreground">
                 {verdict(overall)}
               </p>
-              <p className="mt-1 max-w-[32ch] text-[11.5px] leading-5 text-muted-foreground">
-                The mean of the four scores below. Generated from the repository
-                snapshot at review time.
+              <p className="mt-1 max-w-[32ch] text-[11px] leading-5 text-muted-foreground">
+                The mean of the four scores below. Generated from the repository snapshot at review time.
               </p>
             </div>
           </div>
 
-          <div className="grid flex-1 grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="flex-1 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {scores.map((score) => (
-              <div key={score.label} className="rounded-xl border border-border/60 bg-white/[0.018] p-3">
+              <div key={score.label} className="rounded-lg border border-border bg-card p-3">
                 <div className="flex items-center justify-between">
                   <score.icon className="h-3.5 w-3.5 text-muted-foreground" />
-                  <span className="font-mono text-[8px] text-muted-foreground/50">/100</span>
+                  <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground/50">
+                    /100
+                  </span>
                 </div>
                 <p className="mt-2.5 text-[22px] font-semibold leading-none tracking-[-0.05em] text-foreground">
                   {score.value}
                 </p>
-                <p className="mt-1.5 font-mono text-[8.5px] uppercase tracking-[0.1em] text-muted-foreground">
+                <p className="mt-1.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
                   {score.label}
                 </p>
               </div>
@@ -212,41 +213,37 @@ export default function CodeReview() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-5 py-3 sm:px-6">
-          <span className="inline-flex items-center gap-1.5 font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted-foreground">
-            {analysis.is_public ? <Share2 className="h-3 w-3 text-primary" /> : <Lock className="h-3 w-3" />}
+        <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[9px] uppercase tracking-wider text-muted-foreground/60">
+          <span className="inline-flex items-center gap-1.5">
+            {analysis.is_public ? <Share2 className="h-3 w-3 text-brand" /> : <Lock className="h-3 w-3" />}
             {analysis.is_public ? "Public report" : "Private report"}
           </span>
-          <span className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted-foreground">
-            {formatType(analysis.analysis_type)}
-          </span>
-          <span className="ml-auto font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground/60">
-            AI-generated · verify before shipping
-          </span>
+          <span>{formatType(analysis.analysis_type)}</span>
+          <span className="ml-auto">AI-generated · verify before shipping</span>
         </div>
       </section>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
-        <section className="panel p-5 lg:col-span-2">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-3.5 w-3.5 text-primary" />
-            <h2 className="text-[13.5px] font-medium text-foreground">Summary</h2>
+      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+        <section className="rounded-xl border border-border bg-card p-6 lg:col-span-2">
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles className="h-3.5 w-3.5 text-brand" />
+            <h2 className="text-sm font-semibold text-foreground">Summary</h2>
           </div>
-          <p className="mt-3 text-[13px] leading-7 text-muted-foreground">
+          <p className="text-sm leading-relaxed text-muted-foreground">
             {report.summary || "No summary was returned with this analysis."}
           </p>
         </section>
 
-        <section className="panel p-5">
-          <p className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground">
+        <section className="rounded-xl border border-border bg-card p-6">
+          <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground mb-4">
             What this is
           </p>
-          <p className="mt-3 text-[12px] leading-6 text-muted-foreground">
+          <p className="text-sm leading-relaxed text-muted-foreground">
             A model-generated review intended to shorten the first pass. It is
             not a security audit or a certification. Findings should be checked
             against the code before they change a release decision.
           </p>
-          <div className="mt-4 space-y-2 border-t border-border/60 pt-4">
+          <div className="mt-5 pt-4 border-t border-border space-y-2">
             <InfoRow label="Repository" value={name} />
             <InfoRow label="Scores" value="4 dimensions" />
             <InfoRow label="Findings" value={`${countFindings(report)} items`} />
@@ -254,12 +251,12 @@ export default function CodeReview() {
         </section>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="mt-8 grid gap-4 md:grid-cols-2">
         <ReportSection
           icon={CheckCircle2}
           title="Strengths"
           items={report.strengths || []}
-          tone="text-primary"
+          tone="text-brand"
           empty="No strengths were listed."
         />
         <ReportSection
@@ -285,14 +282,14 @@ export default function CodeReview() {
         />
       </div>
 
-      <div className="mt-4 flex flex-col gap-3 rounded-xl border border-border/60 bg-white/[0.015] p-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[11.5px] leading-5 text-muted-foreground">
+      <div className="mt-8 rounded-xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm leading-relaxed text-muted-foreground">
           Want a second opinion from the agent? It can read a pull request and
           propose a fix directly on GitHub.
         </p>
-        <Button variant="outline" size="sm" asChild>
+        <Button variant="outline" size="sm" className="mt-4 sm:mt-0 w-full sm:w-auto" asChild>
           <Link to="/autonomous-agent">
-            <span>Open the AI agent <ArrowUpRight className="h-3 w-3" /></span>
+            <span>Open the AI agent <ArrowUpRight className="h-3.5 w-3.5" /></span>
           </Link>
         </Button>
       </div>
@@ -307,26 +304,26 @@ function ReportSection({
   tone,
   empty,
 }: {
-  icon: typeof Code2;
+  icon: React.ComponentType<{ className?: string }>;
   title: string;
   items: string[];
   tone: string;
   empty: string;
 }) {
   return (
-    <section className="panel p-5">
-      <div className="flex items-center gap-2">
+    <section className="rounded-xl border border-border bg-card p-6">
+      <div className="flex items-center gap-2 mb-4">
         <Icon className={`h-3.5 w-3.5 ${tone}`} />
-        <h2 className="text-[13px] font-medium text-foreground">{title}</h2>
+        <h2 className="text-sm font-medium text-foreground">{title}</h2>
         <span className="ml-auto font-mono text-[9px] text-muted-foreground/50">{items.length}</span>
       </div>
       {items.length === 0 ? (
-        <p className="mt-4 text-[12px] text-muted-foreground/70">{empty}</p>
+        <p className="text-sm text-muted-foreground/70">{empty}</p>
       ) : (
         <ul className="mt-4 space-y-2.5">
           {items.map((item, index) => (
-            <li key={index} className="flex items-start gap-2.5 text-[12px] leading-6 text-muted-foreground">
-              <span className={`mt-2 h-1 w-1 shrink-0 rounded-full ${tone.replace("text-", "bg-")}`} />
+            <li key={index} className="flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
+              <span className={`mt-0.5 h-1 w-1 shrink-0 rounded-full ${tone.replace("text-", "bg-")}`} />
               {item}
             </li>
           ))}
@@ -338,9 +335,9 @@ function ReportSection({
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-[11px] text-muted-foreground">{label}</span>
-      <span className="truncate font-mono text-[9.5px] text-foreground/75">{value}</span>
+    <div className="flex items-center justify-between gap-3 mb-2">
+      <span className="text-[10px] text-muted-foreground">{label}</span>
+      <span className="truncate font-mono text-[10px] text-foreground/75">{value}</span>
     </div>
   );
 }
