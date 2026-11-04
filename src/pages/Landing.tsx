@@ -3,32 +3,21 @@ import {
   ArrowRight,
   ArrowUpRight,
   BadgeCheck,
-  Boxes,
-  Braces,
   Check,
-  CheckCircle2,
   ChevronRight,
-  CircleDot,
-  Cpu,
-  Database,
   FileCode2,
   GitBranch,
   GitPullRequest,
   Globe2,
-  Layers,
   LockKeyhole,
   MessageSquareCode,
-  Play,
   ScanSearch,
   ShieldCheck,
   Sparkles,
   Terminal,
-  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Reveal } from "@/components/site/Reveal";
-import { LogoMark } from "@/components/brand/Logo";
-import { ScoreRing } from "@/components/app/ScoreRing";
+import { Logo } from "@/components/brand/Logo";
 
 const stack = [
   { name: "NVIDIA NIM", detail: "Nemotron models" },
@@ -40,1212 +29,398 @@ const stack = [
 const faqs = [
   {
     q: "Is it actually free?",
-    a: "Yes. Code Companion AI is free during the public beta. There is no card on file, no trial countdown, and no automatic charge. Paid tiers are planned but not yet available.",
+    a: "Yes. Code Companion AI is free during the public beta. No card on file, no trial countdown, no automatic charge.",
   },
   {
     q: "What happens to my source code?",
-    a: "Repository files are fetched with your encrypted GitHub token and sent to NVIDIA NIM for inference. Tokens are encrypted with AES-256-GCM and never exposed to the browser. Your data lives in an EU Supabase region.",
+    a: "Repository files are fetched with your encrypted GitHub token and sent to NVIDIA NIM for inference. Tokens are encrypted server-side and never exposed to the browser.",
   },
   {
-    q: "Does the agent push commits to my repository?",
-    a: "No. The AI agent reads the pull request diff and posts precise fix suggestions as a GitHub review comment. A human stays in control of every merge and every commit.",
+    q: "Does the agent push commits?",
+    a: "No. The AI agent reads the diff and posts fix suggestions as a GitHub review comment. A human stays in control of every merge.",
   },
   {
     q: "Which models are used?",
-    a: "NVIDIA Nemotron 3 Ultra is the primary model, with Nemotron 3.5 Lightning and Llama 3.1 Nemotron 70B as automatic fallbacks if the primary is unavailable.",
-  },
-  {
-    q: "Are you SOC 2 certified?",
-    a: "Not yet. We have designed controls around SOC 2 requirements — encryption, least-privilege access, audit logging and row-level security — and certification is in progress. We will not claim a certification we have not earned.",
+    a: "NVIDIA Nemotron 3 Ultra is primary, with Nemotron 3.5 Lightning and Llama 3.1 Nemotron 70B as automatic fallbacks.",
   },
 ];
 
 export default function Landing() {
   return (
-    <div className="relative overflow-hidden">
-      <HeroBackdrop />
-
-      {/* ---------------- Hero ---------------- */}
-      <section className="relative pb-16 pt-40 sm:pb-24 sm:pt-52">
-        <div className="container-page">
-          <div className="mx-auto max-w-4xl text-center">
-            <Reveal>
-              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.03] px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                AI-native engineering intelligence
-                <span className="text-border">/</span>
-                <span className="text-foreground/70">Public beta</span>
-              </span>
-            </Reveal>
-
-            <Reveal delay={60}>
-              <h1 className="text-h1 mx-auto mt-6 max-w-[48ch] text-foreground">
-                Ship code you can <span className="font-medium text-brand">defend.</span>
-              </h1>
-            </Reveal>
-
-            <Reveal delay={120}>
-              <p className="mx-auto mt-6 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">
-                Review every pull request, surface security issues humans miss,
-                and hand the fix to an AI agent. Powered by NVIDIA Nemotron.
-              </p>
-            </Reveal>
-
-            <Reveal delay={180}>
-              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <Button size="lg" className="w-full sm:w-auto" asChild>
-                  <Link to="/signup">
-                    <span>Start building free <ArrowRight className="h-4 w-4" /></span>
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
-                  <Link to="/features">
-                    <span><Play className="h-3.5 w-3.5" /> See the platform</span>
-                  </Link>
-                </Button>
-              </div>
-            </Reveal>
-
-            <Reveal delay={260}>
-              <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 font-mono text-[11px] uppercase tracking-wider text-muted-foreground/60">
-                <span className="inline-flex items-center gap-1.5"><Check className="h-3 w-3 text-brand" /> No credit card</span>
-                <span className="inline-flex items-center gap-1.5"><Check className="h-3 w-3 text-brand" /> GitHub OAuth</span>
-                <span className="inline-flex items-center gap-1.5"><Check className="h-3 w-3 text-brand" /> $0 during beta</span>
-              </div>
-            </Reveal>
-          </div>
-
-          <Reveal delay={300} className="relative mt-14 sm:mt-20">
-            <ProductWindow />
-          </Reveal>
-
-          <Reveal delay={100} className="mt-12 sm:mt-16">
-            <div className="flex flex-col items-center gap-5 border-y border-border/60 py-6 sm:flex-row sm:justify-between">
-              <p className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-muted-foreground/70">
-                Built on infrastructure you already trust
-              </p>
-              <div className="grid w-full grid-cols-2 gap-x-8 gap-y-4 sm:flex sm:w-auto sm:items-center sm:gap-9">
-                {stack.map((item) => (
-                  <div key={item.name} className="flex items-center gap-2.5">
-                    <span className="h-1 w-1 rounded-full bg-primary/70" />
-                    <div>
-                      <p className="text-[12.5px] font-medium text-foreground/90">{item.name}</p>
-                      <p className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground/60">
-                        {item.detail}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+    <div className="relative">
+      {/* Hero */}
+      <section className="relative pt-20 sm:pt-32 pb-24 sm:pb-32">
+        <div className="container relative">
+          <div className="mx-auto max-w-5xl text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Code review, security & fixes
+              <span className="text-border">/</span>
+              <span className="text-foreground/60">Public beta</span>
             </div>
-          </Reveal>
-        </div>
-      </section>
 
-      {/* ---------------- Positioning ---------------- */}
-      <section className="relative py-24 sm:py-32">
-        <div className="container-page">
-          <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
-            <Reveal>
-              <p className="eyebrow">The bottleneck</p>
-              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
-                Review is where velocity goes <span className="font-medium text-brand">die.</span>
-              </h2>
-            </Reveal>
-            <Reveal delay={100} className="lg:pt-2">
-              <p className="mt-4 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">
-                Great engineers spend their best hours writing the same comments,
-                missing the same classes of bugs, and waiting for a second pair of
-                eyes. Code Companion turns that work into a system: consistent
-                analysis, traceable findings, and fixes your team can actually use.
-              </p>
-              <div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-border bg-border/30 sm:grid-cols-3">
-                {[
-                  { value: "6", label: "review dimensions", sub: "quality · security · performance · architecture" },
-                  { value: "3", label: "model fallbacks", sub: "automatic failover" },
-                  { value: "1", label: "review surface", sub: "repo, PR and agent in one place" },
-                ].map((item) => (
-                  <div key={item.label} className="bg-surface px-6 py-8">
-                    <p className="text-[24px] font-semibold leading-none tracking-tight text-foreground">
-                      {item.value}
-                    </p>
-                    <p className="mt-2 text-[11px] font-medium text-foreground/70">{item.label}</p>
-                    <p className="mt-1 text-[10px] leading-4 text-muted-foreground">{item.sub}</p>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
+            <h1 className="text-h1 mx-auto mt-8 max-w-[48ch] text-foreground">
+              Ship code you can{" "}
+              <span className="font-medium text-brand">defend.</span>
+            </h1>
 
-      {/* ---------------- Feature bento ---------------- */}
-      <section id="platform" className="relative py-24 sm:py-32">
-        <div className="container-page">
-          <Reveal className="mb-10 flex flex-col gap-5 sm:mb-14 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="eyebrow">The platform</p>
-              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
-                One system for the whole <span className="font-medium text-brand">review.</span>
-              </h2>
-            </div>
-            <p className="mt-4 max-w-[38ch] text-sm leading-relaxed text-muted-foreground">
-              Every surface is connected: the repo feeds the review, the review
-              feeds the agent, and every finding is traceable back to a file and a line.
+            <p className="mx-auto mt-6 max-w-[56ch] text-lg leading-relaxed text-muted-foreground">
+              Review every pull request, surface security issues humans miss,
+              and hand the fix to an AI agent.
             </p>
-          </Reveal>
 
-          <div className="grid gap-4 lg:grid-cols-3">
-            <Reveal>
-              <FeatureCard
-                icon={MessageSquareCode}
-                eyebrow="AI code review"
-                title="A staff engineer's read on every diff"
-                copy="Structured scores, strengths, weaknesses and refactoring suggestions — not a wall of generic prose."
-              >
-                <ReviewVisual />
-              </FeatureCard>
-            </Reveal>
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button size="lg" className="w-full sm:w-auto" asChild>
+                <Link to="/signup">
+                  <span>Start building free <ArrowRight className="h-4 w-4" /></span>
+                </Link>
+              </Button>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
+                <Link to="/features">
+                  <span>See the platform</span>
+                </Link>
+              </Button>
+            </div>
 
-            <Reveal delay={70}>
-              <FeatureCard
-                icon={ShieldCheck}
-                eyebrow="Security"
-                title="Security that reads context"
-                copy="Hardcoded secrets, injection paths, unsafe auth and risky dependencies, ranked by severity."
-              >
-                <SecurityVisual />
-              </FeatureCard>
-            </Reveal>
-
-            <Reveal delay={40}>
-              <FeatureCard
-                icon={Boxes}
-                eyebrow="Architecture"
-                title="See the shape of the system"
-                copy="Detected patterns, separation of concerns and modularity signals, explained in plain language."
-              >
-                <ArchitectureVisual />
-              </FeatureCard>
-            </Reveal>
-
-            <Reveal delay={110}>
-              <FeatureCard
-                icon={Wand2}
-                eyebrow="AI agent"
-                title="From finding to fix, in the pull request"
-                copy="The agent reads the diff, proposes precise fixes and posts them as a native GitHub review comment. No silent commits."
-              >
-                <AgentVisual />
-              </FeatureCard>
-            </Reveal>
-
-            <Reveal delay={60}>
-              <FeatureCard
-                icon={Braces}
-                eyebrow="Models"
-                title="Nemotron first. Always available."
-                copy="Primary and fallback models are configured server-side, so a provider hiccup never blocks a review."
-                compact
-              >
-                <ModelVisual />
-              </FeatureCard>
-            </Reveal>
-
-            <Reveal delay={120}>
-              <FeatureCard
-                icon={FileCode2}
-                eyebrow="Reporting"
-                title="Reports leadership can read"
-                copy="Share a clean, public report with scores and findings. Private by default; one click to share."
-                compact
-              >
-                <ReportVisual />
-              </FeatureCard>
-            </Reveal>
-
-            <Reveal delay={180}>
-              <FeatureCard
-                icon={Terminal}
-                eyebrow="Workflow"
-                title="Fits the tools you already use"
-                copy="Dashboard, API and CLI. Trigger an analysis where your team already works."
-                compact
-              >
-                <CliVisual />
-              </FeatureCard>
-            </Reveal>
+            <div className="mt-12 flex items-center justify-center gap-x-6 gap-y-4 font-mono text-[11px] uppercase tracking-wider text-muted-foreground/50">
+              <Check className="h-3 w-3 text-brand" />
+              <span>No credit card</span>
+              <span>·</span>
+              <Check className="h-3 w-3 text-brand" />
+              <span>GitHub OAuth</span>
+              <span>·</span>
+              <Check className="h-3 w-3 text-brand" />
+              <span>$0 during beta</span>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ---------------- Workflow ---------------- */}
-      <section className="relative border-y border-border bg-[#070808] py-24 sm:py-32">
-        <div className="container-page">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <p className="eyebrow">How it works</p>
+      {/* Trust logos */}
+      <section className="border-y border-border py-16">
+        <div className="container relative">
+          <p className="text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground/50">
+            Built on
+          </p>
+          <div className="mt-8 grid w-full grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+            {stack.map((item) => (
+              <div
+                key={item.name}
+                className="flex items-center justify-between rounded-lg border border-border bg-surface px-4 py-3"
+              >
+                <div>
+                  <p className="text-sm font-medium text-foreground">{item.name}</p>
+                  <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
+                    {item.detail}
+                  </p>
+                </div>
+                <ArrowUpRight className="h-3 w-3 text-muted-foreground/30" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Platform */}
+      <section className="py-24 sm:py-32">
+        <div className="container relative">
+          <div className="mx-auto max-w-4xl text-center mb-16">
+            <p className="text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              The platform
+            </p>
             <h2 className="text-h2 mt-4 text-foreground">
-              From repository to <span className="font-medium text-brand">resolved</span> in three moves.
+              One system for the whole{" "}
+              <span className="font-medium text-brand">review.</span>
+            </h2>
+            <p className="mx-auto mt-6 max-w-[42ch] text-sm leading-relaxed text-muted-foreground">
+              Every surface is connected: the repo feeds the review, the review
+              feeds the agent, every finding traceable to a file and line.
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            <FeatureCard
+              icon={MessageSquareCode}
+              eyebrow="AI code review"
+              title="A staff engineer's read on every diff"
+              copy="Structured scores, strengths, weaknesses and refactoring suggestions — not a wall of generic prose."
+            />
+            <FeatureCard
+              icon={ShieldCheck}
+              eyebrow="Security"
+              title="Security that reads context"
+              copy="Hardcoded secrets, injection paths, unsafe auth and risky dependencies, ranked by severity."
+            />
+            <FeatureCard
+              icon={ScanSearch}
+              eyebrow="Architecture"
+              title="See the shape of the system"
+              copy="Detected patterns, separation of concerns and modularity signals, explained in plain language."
+            />
+            <FeatureCard
+              icon={Sparkles}
+              eyebrow="AI agent"
+              title="From finding to fix, in the pull request"
+              copy="The agent reads the diff, proposes precise fixes and posts them as a native GitHub review comment."
+            />
+            <FeatureCard
+              icon={FileCode2}
+              eyebrow="Reporting"
+              title="Reports leadership can read"
+              copy="Share a clean, public report with scores and findings. Private by default."
+            />
+            <FeatureCard
+              icon={Terminal}
+              eyebrow="Workflow"
+              title="Fits the tools you already use"
+              copy="Dashboard, API and CLI. Trigger an analysis where your team works."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="border-y border-border py-24 sm:py-32">
+        <div className="container relative">
+          <div className="mx-auto max-w-3xl text-center mb-16">
+            <p className="text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              How it works
+            </p>
+            <h2 className="text-h2 mt-4 text-foreground">
+              From repository to <span className="font-medium text-brand">resolved.</span>
             </h2>
             <p className="mx-auto mt-6 max-w-[48ch] text-sm leading-relaxed text-muted-foreground">
-              No workflow migration. No YAML to maintain. Connect GitHub, run a
-              review, and decide what ships.
+              Connect GitHub, run a review, and decide what ships.
             </p>
-          </Reveal>
+          </div>
 
-          <div className="mt-14 grid gap-4 md:grid-cols-3">
-            {[
-              {
-                n: "01",
-                icon: GitBranch,
-                title: "Connect your GitHub",
-                copy: "OAuth in one click. Repositories sync, tokens are encrypted, and you choose what to analyze.",
-                visual: (
-                  <div className="rounded-xl border border-border/70 bg-[#0B0D0E] p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                        <GitBranch className="h-3.5 w-3.5 text-primary" /> acme/platform
-                      </span>
-                      <span className="rounded-full border border-success/25 bg-success/10 px-2 py-0.5 font-mono text-[8.5px] uppercase tracking-[0.1em] text-success">
-                        connected
-                      </span>
-                    </div>
-                    <div className="mt-4 space-y-2">
-                      {["payments-api", "web-console", "design-system"].map((repo) => (
-                        <div key={repo} className="flex items-center gap-2 rounded-lg border border-border/50 bg-white/[0.02] px-2.5 py-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
-                          <span className="font-mono text-[10px] text-muted-foreground">{repo}</span>
-                          <span className="ml-auto font-mono text-[8.5px] text-muted-foreground/50">TypeScript</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ),
-              },
-              {
-                n: "02",
-                icon: ScanSearch,
-                title: "Run the review",
-                copy: "Analyze a repo or paste a pull request URL. Scores, findings and a fix plan come back in one pass.",
-                visual: (
-                  <div className="rounded-xl border border-border/70 bg-[#0B0D0E] p-4">
-                    <div className="flex items-center justify-between text-[10px]">
-                      <span className="font-mono text-muted-foreground">analysis / full_review</span>
-                      <span className="font-mono text-primary">running</span>
-                    </div>
-                    <div className="mt-4 flex items-center gap-4">
-                      <ScoreRing score={86} size={62} strokeWidth={5} />
-                      <div className="flex-1 space-y-2">
-                        {[
-                          { label: "Security", value: "94" },
-                          { label: "Performance", value: "78" },
-                          { label: "Architecture", value: "82" },
-                        ].map((row) => (
-                          <div key={row.label} className="flex items-center gap-2">
-                            <span className="w-16 text-[9.5px] text-muted-foreground">{row.label}</span>
-                            <span className="h-1 flex-1 overflow-hidden rounded-full bg-border">
-                              <span className="block h-full rounded-full bg-primary/70" style={{ width: `${row.value}%` }} />
-                            </span>
-                            <span className="font-mono text-[9px] text-foreground/70">{row.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ),
-              },
-              {
-                n: "03",
-                icon: GitPullRequest,
-                title: "Ship the fix",
-                copy: "Review the agent's suggestion, post it to GitHub, and merge with evidence instead of opinion.",
-                visual: (
-                  <div className="rounded-xl border border-border/70 bg-[#0B0D0E] p-4">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-primary">
-                        <CheckCircle2 className="h-3 w-3" />
-                      </span>
-                      <span className="text-[10.5px] font-medium text-foreground">Fix posted to PR #184</span>
-                    </div>
-                    <div className="mt-3 rounded-lg border border-border/60 bg-white/[0.02] p-3">
-                      <p className="font-mono text-[9px] text-muted-foreground">api/webhooks/stripe.ts:42</p>
-                      <p className="mt-1.5 text-[10.5px] leading-5 text-muted-foreground">
-                        Verify the webhook signature before trusting the event payload.
-                      </p>
-                      <div className="mt-2 flex items-center gap-1.5 text-[9.5px] text-primary">
-                        <Sparkles className="h-3 w-3" /> 96% confidence
-                      </div>
-                    </div>
-                  </div>
-                ),
-              },
-            ].map((step) => (
-              <div key={step.n} className="group relative rounded-xl border border-border bg-card p-6 transition-colors hover:border-border sm:p-8">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] tracking-[0.16em] text-muted-foreground/60">{step.n}</span>
-                  <step.icon className="h-4 w-4 text-muted-foreground/60" />
-                </div>
-                <h3 className="mt-5 text-[15.5px] font-semibold tracking-tight text-foreground">{step.title}</h3>
-                <p className="mt-2 min-h-[60px] text-[12.5px] leading-5 text-muted-foreground">{step.copy}</p>
-                <div className="mt-4">{step.visual}</div>
-              </div>
-            ))}
+          <div className="grid gap-8 md:grid-cols-3">
+            <StepCard
+              n="01"
+              icon={GitBranch}
+              title="Connect your GitHub"
+              copy="OAuth in one click. Repositories sync, tokens are encrypted, and you choose what to analyze."
+            />
+            <StepCard
+              n="02"
+              icon={ScanSearch}
+              title="Run the review"
+              copy="Analyze a repo or paste a PR URL. Scores, findings and a fix plan come back in one pass."
+            />
+            <StepCard
+              n="03"
+              icon={GitPullRequest}
+              title="Ship the fix"
+              copy="Review the agent's suggestion, post it to GitHub, and merge with evidence instead of opinion."
+            />
           </div>
         </div>
       </section>
 
-      {/* ---------------- Security ---------------- */}
-      <section className="relative py-24 sm:py-32">
-        <div className="container-page">
-          <div className="relative overflow-hidden rounded-xl border border-border bg-[#070808]/50 p-8 sm:p-12 lg:p-16">
-            <div className="grid gap-8 lg:grid-cols-[1fr_0.95fr] lg:gap-16">
-              <Reveal>
-                <p className="eyebrow">Security posture</p>
-                <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
-                  Your code stays <span className="font-medium text-brand">yours.</span>
-                </h2>
-                <p className="mt-6 max-w-[48ch] text-sm leading-relaxed text-muted-foreground">
-                  Security is architecture, not a badge. Tokens are encrypted
-                  before they touch the database, every table is scoped to its
-                  owner, and inference happens through NVIDIA's API — never in
-                  your browser.
-                </p>
-
-                <div className="mt-10 space-y-4">
-                  {[
-                    {
-                      icon: LockKeyhole,
-                      title: "AES-256-GCM token encryption",
-                      copy: "GitHub credentials are encrypted server-side and decrypted only inside edge functions.",
-                    },
-                    {
-                      icon: Database,
-                      title: "Row-level security by default",
-                      copy: "Every repository, analysis and fix is isolated to the authenticated owner.",
-                    },
-                    {
-                      icon: Globe2,
-                      title: "EU data region",
-                      copy: "Supabase Postgres and Auth run in eu-north-1 (Stockholm).",
-                    },
-                    {
-                      icon: BadgeCheck,
-                      title: "SOC 2 aligned controls",
-                      copy: "Designed around SOC 2 requirements. Certification is in progress — not yet completed.",
-                    },
-                  ].map((item) => (
-                    <div key={item.title} className="flex gap-3 rounded-lg border border-border bg-card p-4">
-                      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-brand">
-                        <item.icon className="h-3.5 w-3.5" />
-                      </span>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{item.title}</p>
-                        <p className="mt-0.5 text-[11px] leading-5 text-muted-foreground">{item.copy}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Reveal>
-
-              <Reveal delay={120} className="lg:pt-6">
-                <div className="overflow-hidden rounded-lg border border-border bg-[#08090A] shadow-sm">
-                  <div className="flex items-center justify-between border-b border-border px-4 py-3">
-                    <div className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full bg-[#FF5F57]/70" />
-                      <span className="h-2 w-2 rounded-full bg-[#FEBC2E]/70" />
-                      <span className="h-2 w-2 rounded-full bg-[#28C840]/70" />
-                    </div>
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
-                      request trace
-                    </span>
-                  </div>
-                  <div className="space-y-1 p-5 font-mono text-xs leading-6 text-muted-foreground">
-                    <p><span className="text-brand">→</span> browser <span className="text-muted-foreground/40">────</span> edge function <span className="text-foreground/70">verify JWT</span></p>
-                    <p><span className="text-brand">→</span> decrypt <span className="text-foreground/70">github token</span> <span className="text-muted-foreground/50">AES-256-GCM</span></p>
-                    <p><span className="text-brand">→</span> github api <span className="text-foreground/70">fetch repository tree</span></p>
-                    <p><span className="text-brand">→</span> nvidia nim <span className="text-foreground/70">nemotron 3 ultra</span></p>
-                    <p><span className="text-brand">←</span> structured report <span className="text-success">validated json</span></p>
-                    <p><span className="text-brand">←</span> postgres <span className="text-foreground/70">RLS-scoped insert</span></p>
-                  </div>
-                  <div className="border-t border-border p-4">
-                    <div className="flex items-center justify-between rounded-lg border border-border bg-white/[0.02] p-3">
-                      <div className="flex items-center gap-2">
-                        <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand/10 text-brand">
-                          <ShieldCheck className="h-3.5 w-3.5" />
-                        </span>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">Token never reaches the client</p>
-                          <p className="font-mono text-[10px] text-muted-foreground">server-side only</p>
-                        </div>
-                      </div>
-                      <span className="rounded-full border border-brand/25 bg-brand/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-brand">
-                        verified
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-5 flex items-start gap-2.5 rounded-xl border border-warning/20 bg-warning/[0.04] p-3.5">
-                  <CircleDot className="mt-0.5 h-3.5 w-3.5 shrink-0 text-warning" />
-                  <p className="text-[10.5px] leading-5 text-muted-foreground">
-                    <span className="font-medium text-foreground/90">Honest disclosure:</span>{" "}
-                    SOC 2 Type II certification is in progress. We publish the
-                    work, not a premature badge.{" "}
-                    <Link to="/security-policy" className="text-primary underline-offset-2 hover:underline">
-                      Read the security policy
-                    </Link>
-                    .
-                  </p>
-                </div>
-              </Reveal>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------- Pricing preview ---------------- */}
-      <section className="relative pb-24 pt-8 sm:pb-32">
-        <div className="container-page">
-          <Reveal className="mb-10 flex flex-col gap-5 sm:mb-12 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="eyebrow">Pricing</p>
-              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
-                Free while we earn <span className="font-medium text-brand">trust.</span>
-              </h2>
-            </div>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/pricing">
-                <span>Compare plans <ArrowUpRight className="h-3.5 w-3.5" /></span>
-              </Link>
-            </Button>
-          </Reveal>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            {[
-              {
-                name: "Starter",
-                price: "$0",
-                note: "free during beta",
-                copy: "For individual engineers who want a second pair of eyes.",
-                features: ["5 repositories", "10 analyses / day", "Security scanning", "Shareable reports"],
-                cta: "Start free",
-                href: "/signup",
-                highlight: false,
-              },
-              {
-                name: "Professional",
-                price: "$49",
-                note: "planned",
-                copy: "For teams shipping to production every day.",
-                features: ["50 repositories", "5,000 analyses / month", "PR review comments", "Team workspaces", "Priority support"],
-                cta: "Join early access",
-                href: "mailto:sales@codecompanion.ai?subject=Professional%20early%20access",
-                highlight: true,
-              },
-              {
-                name: "Enterprise",
-                price: "Custom",
-                note: "scoped",
-                copy: "For organizations with procurement and compliance requirements.",
-                features: ["Unlimited repositories", "SAML SSO (roadmap)", "Data residency", "Self-hosted option", "Dedicated support"],
-                cta: "Talk to sales",
-                href: "/enterprise",
-                highlight: false,
-              },
-            ].map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative flex flex-col rounded-xl border border-border bg-card p-8 ${
-                  plan.highlight
-                    ? "border-brand bg-brand/5"
-                    : ""
-                }`}
-              >
-                {plan.highlight && (
-                  <span className="absolute -top-3 left-8 rounded-full border border-brand bg-brand px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-brand-foreground">
-                    Planned tier
-                  </span>
-                )}
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-foreground">{plan.name}</p>
-                  <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground/60">{plan.note}</span>
-                </div>
-                <div className="mt-6 flex items-baseline gap-1">
-                  <span className="text-[32px] font-medium leading-none tracking-tight text-foreground">{plan.price}</span>
-                  {plan.price === "$49" && <span className="text-xs text-muted-foreground">/ month</span>}
-                </div>
-                <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{plan.copy}</p>
-                <ul className="mt-6 flex-1 space-y-3 border-t border-border pt-6">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Check className="h-3 w-3 shrink-0 text-brand" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Button
-                  variant={plan.highlight ? "default" : "outline"}
-                  className="mt-6 w-full"
-                  asChild
-                >
-                  {plan.href.startsWith("http") || plan.href.startsWith("mailto") ? (
-                    <a href={plan.href}>{plan.cta}</a>
-                  ) : (
-                    <Link to={plan.href}>{plan.cta}</Link>
-                  )}
-                </Button>
-              </div>
-            ))}
-          </div>
-          <p className="mt-5 text-center font-mono text-[9.5px] uppercase tracking-[0.13em] text-muted-foreground/60">
-            Paid plans are not yet available · No automatic charges · Cancel anytime (there is nothing to cancel)
-          </p>
-        </div>
-      </section>
-
-      {/* ---------------- Open source ---------------- */}
-      <section className="relative border-y border-border bg-[#070808]/50 py-24 sm:py-32">
-        <div className="container-page">
-          <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-            <Reveal>
-              <p className="eyebrow">Built in public</p>
-              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
-                Don't trust the pitch. <span className="font-medium text-brand">Read the code.</span>
-              </h2>
-              <p className="mt-6 max-w-[50ch] text-sm leading-relaxed text-muted-foreground">
-                The entire product — edge functions, database policies, CLI and
-                this frontend — is open for inspection. If a claim on this page
-                isn't backed by the repository, it doesn't belong here.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Button variant="outline" asChild>
-                  <a href="https://github.com/Hareesh-Reddy-9126/code-companion-ai-" target="_blank" rel="noreferrer">
-                    <span><GitBranch className="h-4 w-4" /> View the repository</span>
-                  </a>
-                </Button>
-                <Button variant="ghost" asChild>
-                  <Link to="/docs">
-                    <span>Read the docs <ChevronRight className="h-3.5 w-3.5" /></span>
-                  </Link>
-                </Button>
-              </div>
-            </Reveal>
-
-            <Reveal delay={100}>
-              <div className="overflow-hidden rounded-lg border border-border bg-[#08090A] shadow-sm">
-                <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <LogoMark size="sm" />
-                    <span className="font-mono text-[10px] text-muted-foreground">code-companion-ai</span>
-                  </div>
-                  <span className="rounded-full border border-brand/25 bg-brand/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-brand">
-                    public
-                  </span>
-                </div>
-                <div className="p-6 font-mono text-xs leading-7">
-                  <p className="text-muted-foreground/50">$ git clone github.com/Hareesh-Reddy-9126/code-companion-ai-</p>
-                  <p className="mt-3 text-muted-foreground/50">$ npm install && npm run dev</p>
-                  <p className="mt-3 text-primary">▲ ready in 1.2s</p>
-                  <p className="text-foreground/70">  local: http://localhost:8080</p>
-                  <p className="mt-4 text-muted-foreground/50"># edge functions · RLS policies · AI pipeline</p>
-                  <p className="text-foreground/70">  supabase/functions/</p>
-                  <p className="text-foreground/70">  supabase/migrations/</p>
-                  <p className="text-foreground/70">  cli/src/index.ts</p>
-                  <p className="mt-4 text-muted-foreground/50"># every claim, auditable</p>
-                  <p className="flex items-center gap-1.5 text-success">
-                    <Check className="h-3 w-3" /> production build passing
-                  </p>
-                </div>
-                <div className="flex items-center justify-between border-t border-border/60 bg-white/[0.015] px-4 py-2.5 font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground/60">
-                  <span>TypeScript · React · Supabase · Deno</span>
-                  <a
-                    href="https://github.com/Hareesh-Reddy-9126/code-companion-ai-"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-1 text-foreground/70 transition-colors hover:text-primary"
-                  >
-                    open <ArrowUpRight className="h-3 w-3" />
-                  </a>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------- FAQ ---------------- */}
+      {/* Security */}
       <section className="py-24 sm:py-32">
-        <div className="container-page">
-          <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
-            <Reveal>
-              <p className="eyebrow">Questions</p>
-              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
-                Straight <span className="font-medium text-brand">answers.</span>
-              </h2>
-              <p className="mt-6 max-w-[34ch] text-sm leading-relaxed text-muted-foreground">
-                No fine print, no fake countdowns. If something isn't live yet,
-                it's labeled as planned.
-              </p>
-              <a
-                href="mailto:support@codecompanion.ai"
-                className="mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-brand hover:underline"
-              >
-                Ask us anything <ArrowUpRight className="h-3.5 w-3.5" />
-              </a>
-            </Reveal>
+        <div className="container relative">
+          <div className="mx-auto max-w-3xl text-center mb-16">
+            <p className="text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              Security posture
+            </p>
+            <h2 className="text-h2 mt-4 text-foreground">
+              Your code stays <span className="font-medium text-brand">yours.</span>
+            </h2>
+          </div>
 
-            <Reveal delay={100}>
-              <div className="divide-y divide-border border-y border-border">
-                {faqs.map((faq) => (
-                  <details key={faq.q} className="group py-6">
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-sm font-medium text-foreground marker:hidden">
-                      {faq.q}
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-transform duration-300 group-open:rotate-45">
-                        <span className="text-base leading-none">+</span>
-                      </span>
-                    </summary>
-                    <p className="mt-4 max-w-[60ch] text-sm leading-relaxed text-muted-foreground">{faq.a}</p>
-                  </details>
-                ))}
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="space-y-4">
+              <TrustItem
+                icon={LockKeyhole}
+                title="AES-256-GCM token encryption"
+                copy="GitHub credentials are encrypted server-side and decrypted only inside edge functions."
+              />
+              <TrustItem
+                icon={Globe2}
+                title="EU data region"
+                copy="Supabase Postgres and Auth run in eu-north-1 (Stockholm)."
+              />
+            </div>
+            <div className="space-y-4">
+              <TrustItem
+                icon={BadgeCheck}
+                title="SOC 2 aligned controls"
+                copy="Designed around SOC 2 requirements. Certification is in progress — not yet completed."
+              />
+              <TrustItem
+                icon={ShieldCheck}
+                title="Row-level security by default"
+                copy="Every repository, analysis and fix is isolated to its owner."
+              />
+            </div>
+          </div>
+
+          <div className="mt-12 p-6 rounded-xl border border-border bg-surface">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-[#FF5F57]/70" />
+                <span className="h-2 w-2 rounded-full bg-[#FEBC2E]/70" />
+                <span className="h-2 w-2 rounded-full bg-[#28C840]/70" />
               </div>
-            </Reveal>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
+                request trace
+              </span>
+            </div>
+            <div className="space-y-2 p-4 font-mono text-xs leading-6 text-muted-foreground">
+              <p>
+                <span className="text-brand">→</span> browser{" "}
+                <span className="text-muted-foreground/40">────</span> edge function{" "}
+                <span className="text-foreground/70">verify JWT</span>
+              </p>
+              <p>
+                <span className="text-brand">→</span> decrypt{" "}
+                <span className="text-foreground/70">github token</span>{" "}
+                <span className="text-muted-foreground/50">AES-256-GCM</span>
+              </p>
+              <p>
+                <span className="text-brand">→</span> github api{" "}
+                <span className="text-foreground/70">fetch repository tree</span>
+              </p>
+              <p>
+                <span className="text-brand">→</span> nvidia nim{" "}
+                <span className="text-foreground/70">nemotron 3 ultra</span>
+              </p>
+              <p>
+                <span className="text-brand">←</span> structured report{" "}
+                <span className="text-success">validated json</span>
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ---------------- CTA ---------------- */}
-      <section className="relative overflow-hidden py-24 sm:py-32">
-        <div className="container-page relative">
-          <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
-            <Reveal>
-              <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground/60">Start today</p>
-              <h2 className="text-h2 mt-4 max-w-[42ch] text-foreground">
-                Make review your <span className="font-medium text-brand">advantage.</span>
-              </h2>
-              <p className="mt-6 max-w-[48ch] text-sm leading-relaxed text-muted-foreground">
-                Connect a repository, run your first analysis, and see what your
-                team has been missing. It takes about four minutes.
-              </p>
-            </Reveal>
-            <Reveal delay={100} className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-              <Button size="lg" asChild>
+      {/* FAQ */}
+      <section className="py-24 sm:py-32">
+        <div className="container relative">
+          <div className="mx-auto max-w-3xl text-center mb-16">
+            <p className="text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground">
+              Questions
+            </p>
+            <h2 className="text-h2 mt-4 text-foreground">
+              Straight <span className="font-medium text-brand">answers.</span>
+            </h2>
+          </div>
+
+          <div className="mx-auto max-w-2xl space-y-3">
+            {faqs.map((faq) => (
+              <details key={faq.q} className="group border-b border-border pb-4 pt-2 last:border-0">
+                <summary className="flex cursor-pointer items-center justify-between gap-4 text-sm font-medium text-foreground marker:hidden list-none">
+                  {faq.q}
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-transform duration-300 group-open:rotate-90">
+                    <span className="text-xs leading-none">+</span>
+                  </span>
+                </summary>
+                <p className="mt-3 max-w-[60ch] text-sm leading-relaxed text-muted-foreground">
+                  {faq.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-24 sm:py-32">
+        <div className="container relative">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="font-mono text-xs uppercase tracking-wider text-muted-foreground/60">
+              Start today
+            </p>
+            <h2 className="text-h2 mt-4 text-foreground">
+              Make review your <span className="font-medium text-brand">advantage.</span>
+            </h2>
+            <p className="mx-auto mt-6 max-w-[48ch] text-sm leading-relaxed text-muted-foreground">
+              Connect a repository, run your first analysis, see what your team
+              has been missing.
+            </p>
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
+              <Button size="lg" className="w-full sm:w-auto" asChild>
                 <Link to="/signup">
                   <span>Start free <ArrowRight className="h-4 w-4" /></span>
                 </Link>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                asChild
-              >
-                <Link to="/enterprise"><span>Talk to us</span></Link>
+              <Button size="lg" variant="outline" className="w-full sm:w-auto" asChild>
+                <Link to="/enterprise">
+                  <span>Talk to us</span>
+                </Link>
               </Button>
-            </Reveal>
-          </div>
-
-          <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-border bg-card sm:grid-cols-3">
-            {[
-              { k: "No credit card", v: "Start with GitHub OAuth" },
-              { k: "EU data region", v: "Stockholm · eu-north-1" },
-              { k: "Full transparency", v: "Public repository, honest docs" },
-            ].map((item) => (
-              <div key={item.k} className="bg-card px-5 py-4">
-                <p className="text-[12px] font-medium">{item.k}</p>
-                <p className="mt-0.5 font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted-foreground">{item.v}</p>
-              </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
     </div>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/* Hero backdrop                                                      */
-/* ------------------------------------------------------------------ */
-
-function HeroBackdrop() {
-  return (
-    <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[900px] overflow-hidden">
-      <div className="absolute left-1/2 top-[-12rem] h-[34rem] w-[52rem] -translate-x-1/2 rounded-full bg-primary/[0.04] blur-[90px]" />
-      <div className="absolute right-[-10rem] top-[12rem] h-[24rem] w-[34rem] rounded-full bg-info/[0.03] blur-[90px]" />
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Product window                                                     */
-/* ------------------------------------------------------------------ */
-
-function ProductWindow() {
-  return (
-    <div className="relative mx-auto max-w-[1080px]">
-
-      {/* Floating annotations */}
-      <div className="absolute -right-4 top-24 z-20 hidden w-[210px] rounded-xl border border-border/80 bg-[#0D0F10]/95 p-3 shadow-panel backdrop-blur lg:block">
-        <div className="flex items-center gap-2">
-          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/12 text-primary">
-            <Sparkles className="h-3 w-3" />
-          </span>
-          <div>
-            <p className="text-[10.5px] font-medium text-foreground">2 fixes proposed</p>
-            <p className="font-mono text-[8.5px] text-muted-foreground">ready for review</p>
-          </div>
-        </div>
-      </div>
-      <div className="absolute -left-6 bottom-24 z-20 hidden w-[220px] rounded-xl border border-border/80 bg-[#0D0F10]/95 p-3 shadow-panel backdrop-blur lg:block">
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-[8.5px] uppercase tracking-[0.12em] text-muted-foreground">token storage</span>
-          <LockKeyhole className="h-3 w-3 text-primary" />
-        </div>
-        <p className="mt-1.5 font-mono text-[10px] text-foreground/85">AES-256-GCM</p>
-        <div className="mt-2 h-1 overflow-hidden rounded-full bg-border">
-          <div className="h-full w-full rounded-full bg-primary/60" />
-        </div>
-      </div>
-
-      <div className="relative overflow-hidden rounded-2xl border border-border/70 bg-[#0A0C0D] shadow-lg">
-
-        {/* window chrome */}
-        <div className="flex h-10 items-center gap-3 border-b border-border/60 bg-white/[0.015] px-4">
-          <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]/70" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]/70" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]/70" />
-          </div>
-          <div className="mx-auto flex items-center gap-2 rounded-md border border-border/50 bg-black/20 px-3 py-1">
-            <LockKeyhole className="h-2.5 w-2.5 text-muted-foreground/50" />
-            <span className="font-mono text-[9px] text-muted-foreground">app.codecompanion.ai/reviews/184</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            <span className="font-mono text-[8.5px] uppercase tracking-[0.1em] text-muted-foreground/60">live</span>
-          </div>
-        </div>
-
-        <div className="grid min-h-[440px] grid-cols-1 md:grid-cols-[150px_1fr] lg:grid-cols-[150px_1fr_215px]">
-          {/* rail */}
-          <div className="hidden border-r border-border/60 bg-[#08090A] p-3 md:block">
-            <div className="mb-5 flex items-center gap-2 px-1">
-              <LogoMark size="sm" />
-              <span className="text-[10.5px] font-semibold tracking-tight text-foreground">Code Companion</span>
-            </div>
-            <div className="space-y-0.5">
-              {[
-                { icon: Layers, label: "Overview", active: false },
-                { icon: GitBranch, label: "Repositories", active: false },
-                { icon: MessageSquareCode, label: "Reviews", active: true },
-                { icon: ShieldCheck, label: "Security", active: false },
-                { icon: Wand2, label: "Agent", active: false },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[10px] ${
-                    item.active ? "bg-white/[0.055] text-foreground" : "text-muted-foreground/70"
-                  }`}
-                >
-                  <item.icon className={`h-3 w-3 ${item.active ? "text-primary" : ""}`} />
-                  {item.label}
-                </div>
-              ))}
-            </div>
-            <div className="mt-5 border-t border-border/60 pt-3">
-              <div className="rounded-lg border border-border/50 bg-white/[0.02] p-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[7.5px] uppercase tracking-[0.1em] text-muted-foreground/60">usage</span>
-                  <span className="font-mono text-[8px] text-foreground/70">3 / 10</span>
-                </div>
-                <div className="mt-1.5 h-0.5 overflow-hidden rounded-full bg-border">
-                  <div className="h-full w-[30%] rounded-full bg-primary" />
-                </div>
-                <p className="mt-1.5 font-mono text-[7.5px] text-muted-foreground/50">analyses today</p>
-              </div>
-            </div>
-          </div>
-
-          {/* main */}
-          <div className="min-w-0 p-4 sm:p-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <GitPullRequest className="h-3.5 w-3.5" />
-                </span>
-                <div>
-                  <p className="text-[11.5px] font-medium text-foreground">Add payments webhook handler</p>
-                  <p className="mt-0.5 font-mono text-[8.5px] text-muted-foreground">
-                    acme/payments-api · PR #184 · +248 −12
-                  </p>
-                </div>
-              </div>
-              <span className="inline-flex w-fit items-center gap-1 rounded-full border border-success/25 bg-success/10 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.1em] text-success">
-                <CheckCircle2 className="h-2.5 w-2.5" /> review complete
-              </span>
-            </div>
-
-            <div className="mt-5 grid grid-cols-3 gap-2">
-              {[
-                { label: "Quality", score: 86 },
-                { label: "Security", score: 94 },
-                { label: "Performance", score: 78 },
-              ].map((score) => (
-                <div key={score.label} className="rounded-xl border border-border/60 bg-white/[0.018] p-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[7.5px] uppercase tracking-[0.12em] text-muted-foreground">{score.label}</span>
-                    <span className="font-mono text-[8px] text-foreground/60">/100</span>
-                  </div>
-                  <p className="mt-2 text-[21px] font-semibold leading-none tracking-[-0.05em] text-foreground">{score.score}</p>
-                  <div className="mt-2 h-0.5 overflow-hidden rounded-full bg-border">
-                    <div
-                      className={`h-full rounded-full ${score.score >= 80 ? "bg-primary" : "bg-warning"}`}
-                      style={{ width: `${score.score}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-4 space-y-2">
-              <FindingRow
-                severity="high"
-                file="api/webhooks/stripe.ts:42"
-                title="Webhook signature is not verified"
-                body="Accepting untrusted event payloads enables forged subscription events."
-              />
-              <FindingRow
-                severity="medium"
-                file="lib/retry.ts:18"
-                title="Retry loop can amplify failures"
-                body="No jitter or cap. Add exponential backoff with a maximum attempt limit."
-              />
-            </div>
-
-            <div className="mt-4 overflow-hidden rounded-lg border border-border/60 bg-[#08090A]">
-              <div className="flex items-center justify-between border-b border-border/50 px-3 py-1.5">
-                <span className="font-mono text-[8px] text-muted-foreground">suggested fix · stripe.ts</span>
-                <span className="font-mono text-[8px] text-primary">+6 −1</span>
-              </div>
-              <div className="p-3 font-mono text-[9px] leading-5">
-                <p className="text-muted-foreground/50">@@ -38,7 +38,12 @@</p>
-                <p className="diff-del px-1 text-[#FF9C9C]">- const event = JSON.parse(body);</p>
-                <p className="diff-add px-1 text-[#B8F08D]">+ const signature = req.headers.get("stripe-signature");</p>
-                <p className="diff-add px-1 text-[#B8F08D]">+ const event = stripe.webhooks.constructEvent(body, signature, secret);</p>
-                <p className="diff-add px-1 text-[#B8F08D]">+ if (!event) return new Response("invalid signature", {"{"} status: 400 {"}"});</p>
-              </div>
-            </div>
-          </div>
-
-          {/* agent */}
-          <div className="hidden border-l border-border/60 bg-[#08090A] p-4 lg:block">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-muted-foreground">
-                <Sparkles className="h-2.5 w-2.5 text-primary" /> agent
-              </span>
-              <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse-soft" />
-            </div>
-            <p className="mt-3 text-[10.5px] font-medium text-foreground">Fix plan</p>
-            <div className="mt-3 space-y-3">
-              {[
-                { label: "Read the diff", done: true },
-                { label: "Identify 2 issues", done: true },
-                { label: "Draft patches", done: true },
-                { label: "Post review comment", done: false },
-              ].map((step) => (
-                <div key={step.label} className="flex items-start gap-2">
-                  <span
-                    className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                      step.done ? "border-primary/30 bg-primary/10 text-primary" : "border-border text-muted-foreground"
-                    }`}
-                  >
-                    {step.done ? <Check className="h-2.5 w-2.5" /> : <CircleDot className="h-2.5 w-2.5" />}
-                  </span>
-                  <span className={`text-[9.5px] leading-4 ${step.done ? "text-foreground/80" : "text-muted-foreground"}`}>
-                    {step.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 rounded-lg border border-border/60 bg-white/[0.02] p-2.5">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-muted-foreground">confidence</span>
-                <span className="font-mono text-[9px] text-primary">96%</span>
-              </div>
-              <div className="mt-2 h-0.5 overflow-hidden rounded-full bg-border">
-                <div className="h-full w-[96%] rounded-full bg-primary" />
-              </div>
-            </div>
-            <div className="mt-3 rounded-lg bg-primary px-2.5 py-2 text-center text-[9px] font-semibold text-primary-foreground">
-              Post to pull request
-            </div>
-            <p className="mt-2 text-center font-mono text-[7.5px] text-muted-foreground/50">human approves every action</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FindingRow({
-  severity,
-  file,
-  title,
-  body,
-}: {
-  severity: "high" | "medium";
-  file: string;
-  title: string;
-  body: string;
-}) {
-  const styles =
-    severity === "high"
-      ? "border-destructive/20 bg-destructive/[0.045] text-destructive"
-      : "border-warning/20 bg-warning/[0.04] text-warning";
-  return (
-    <div className="rounded-lg border border-border/60 bg-white/[0.018] p-2.5">
-      <div className="flex items-center gap-2">
-        <span className={`rounded border px-1.5 py-0.5 font-mono text-[7px] uppercase tracking-[0.08em] ${styles}`}>
-          {severity}
-        </span>
-        <span className="truncate font-mono text-[8px] text-muted-foreground">{file}</span>
-      </div>
-      <p className="mt-1.5 text-[10px] font-medium text-foreground/90">{title}</p>
-      <p className="mt-0.5 line-clamp-1 text-[9px] leading-4 text-muted-foreground">{body}</p>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* Feature card + visuals                                             */
-/* ------------------------------------------------------------------ */
 
 function FeatureCard({
   icon: Icon,
   eyebrow,
   title,
   copy,
-  children,
-  compact = false,
 }: {
-  icon: typeof Cpu;
+  icon: React.ComponentType<{ className?: string }>;
   eyebrow: string;
   title: string;
   copy: string;
-  children: React.ReactNode;
-  compact?: boolean;
 }) {
   return (
-    <div className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-muted-foreground/25 sm:p-6">
-      <div className="pointer-events-none absolute -right-16 -top-20 h-40 w-40 rounded-full bg-primary/[0.035] blur-2xl transition-opacity duration-500 group-hover:bg-primary/[0.065]" />
-      <div className="relative flex items-center gap-2">
-        <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-border/70 bg-secondary/60 text-primary">
-          <Icon className="h-3.5 w-3.5" />
-        </span>
-        <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted-foreground">{eyebrow}</span>
-      </div>
-      <h3 className={`relative mt-4 font-semibold tracking-[-0.03em] text-foreground ${compact ? "text-[15px]" : "text-[17px]"}`}>
-        {title}
-      </h3>
-      <p className="relative mt-2 max-w-[46ch] text-[12.5px] leading-5 text-muted-foreground">{copy}</p>
-      <div className="relative mt-auto pt-5">{children}</div>
-    </div>
-  );
-}
-
-function ReviewVisual() {
-  return (
-    <div className="rounded-xl border border-border/60 bg-[#08090A] p-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <GitPullRequest className="h-3.5 w-3.5 text-primary" />
-          <span className="text-[10.5px] text-foreground/85">feat: rate limit auth endpoints</span>
-        </div>
-        <span className="font-mono text-[8px] text-muted-foreground">#212</span>
-      </div>
-      <div className="mt-3 rounded-lg border border-border/60 bg-white/[0.02] p-3">
-        <div className="flex items-center gap-2">
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-primary">
-            <Sparkles className="h-2.5 w-2.5" />
-          </span>
-          <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-muted-foreground">code companion</span>
-          <span className="ml-auto rounded-full border border-primary/25 bg-primary/10 px-1.5 py-0.5 font-mono text-[7px] uppercase tracking-[0.08em] text-primary">
-            reviewed
-          </span>
-        </div>
-        <p className="mt-2 text-[10px] leading-5 text-muted-foreground">
-          The limiter is keyed by IP only. Behind a proxy, every user shares one
-          bucket. Prefer the authenticated user id, with IP as a fallback.
-        </p>
-        <div className="mt-2.5 flex items-center gap-3 font-mono text-[8px] text-muted-foreground/60">
-          <span>auth/rate-limit.ts:24</span>
-          <span className="text-primary">suggested fix</span>
-        </div>
-      </div>
-      <div className="mt-2.5 flex items-center justify-between rounded-lg border border-border/50 bg-white/[0.015] px-3 py-2">
-        <span className="flex items-center gap-1.5 text-[9.5px] text-muted-foreground">
-          <CheckCircle2 className="h-3 w-3 text-success" /> 4 checks passed
-        </span>
-        <span className="font-mono text-[8px] text-muted-foreground/50">1 suggestion</span>
-      </div>
-    </div>
-  );
-}
-
-function SecurityVisual() {
-  return (
-    <div className="space-y-2">
-      {[
-        { level: "critical", label: "Hardcoded API key", file: "scripts/seed.ts:12", color: "destructive" },
-        { level: "high", label: "Unverified webhook payload", file: "api/stripe.ts:42", color: "warning" },
-        { level: "medium", label: "Missing auth check", file: "routes/admin.ts:8", color: "info" },
-        { level: "low", label: "Verbose error response", file: "lib/errors.ts:31", color: "muted" },
-      ].map((issue) => (
-        <div key={issue.label} className="flex items-center gap-2.5 rounded-lg border border-border/60 bg-white/[0.018] px-3 py-2">
-          <span
-            className={`rounded border px-1.5 py-0.5 font-mono text-[7px] uppercase tracking-[0.08em] ${
-              issue.color === "destructive"
-                ? "border-destructive/25 bg-destructive/10 text-destructive"
-                : issue.color === "warning"
-                  ? "border-warning/25 bg-warning/10 text-warning"
-                  : issue.color === "info"
-                    ? "border-info/25 bg-info/10 text-info"
-                    : "border-border bg-secondary text-muted-foreground"
-            }`}
-          >
-            {issue.level}
-          </span>
-          <span className="min-w-0 flex-1 truncate text-[10px] text-foreground/80">{issue.label}</span>
-          <span className="hidden font-mono text-[8px] text-muted-foreground/50 sm:block">{issue.file}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ArchitectureVisual() {
-  return (
-    <div className="relative overflow-hidden rounded-xl border border-border/60 bg-[#08090A] p-4">
-      <svg viewBox="0 0 300 130" className="w-full" fill="none" aria-hidden="true">
-        <g stroke="hsl(var(--border))" strokeWidth="1">
-          <path d="M52 65h48M148 65h48M200 42v-18h48M200 88v18h48" />
-          <path d="M100 65v-30h48M100 65v30h48" strokeDasharray="3 4" />
-        </g>
-        <g>
-          <rect x="8" y="50" width="44" height="30" rx="7" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" />
-          <text x="30" y="68" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="7" fontFamily="JetBrains Mono">web</text>
-          <rect x="100" y="35" width="48" height="60" rx="8" fill="hsl(var(--brand)/0.1)" stroke="hsl(var(--brand)/0.3)" />
-          <text x="124" y="61" textAnchor="middle" fill="hsl(var(--brand))" fontSize="7" fontFamily="JetBrains Mono">api</text>
-          <text x="124" y="75" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontSize="6" fontFamily="JetBrains Mono">domain</text>
-          <rect x="196" y="28" width="52" height="28" rx="7" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" />
-          <text x="222" y="46" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="7" fontFamily="JetBrains Mono">worker</text>
-          <rect x="196" y="74" width="52" height="28" rx="7" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" />
-          <text x="222" y="92" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="7" fontFamily="JetBrains Mono">db</text>
-        </g>
-      </svg>
-      <div className="mt-2 flex items-center justify-between border-t border-border/50 pt-3">
-        <span className="font-mono text-[8px] text-muted-foreground/60">detected pattern</span>
-        <span className="rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.08em] text-primary">
-          layered monolith
+    <div className="rounded-xl border border-border bg-card p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Icon className="h-4 w-4 text-brand" />
+        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
+          {eyebrow}
         </span>
       </div>
+      <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground leading-relaxed">{copy}</p>
     </div>
   );
 }
 
-function AgentVisual() {
+function StepCard({
+  n,
+  icon: Icon,
+  title,
+  copy,
+}: {
+  n: string;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  copy: string;
+}) {
   return (
-    <div className="grid gap-2 sm:grid-cols-2">
-      <div className="rounded-xl border border-border/60 bg-[#08090A] p-3.5">
-        <div className="flex items-center gap-2">
-          <Wand2 className="h-3 w-3 text-primary" />
-          <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-muted-foreground">agent run</span>
-        </div>
-        <div className="mt-3 space-y-2 font-mono text-[9px] leading-5">
-          <p className="text-muted-foreground/50">01 read diff <span className="text-success">✓</span></p>
-          <p className="text-muted-foreground/50">02 locate issues <span className="text-success">✓</span></p>
-          <p className="text-muted-foreground/50">03 draft patches <span className="text-success">✓</span></p>
-          <p className="text-foreground/70">04 post comment <span className="text-primary">→</span></p>
-        </div>
+    <div className="rounded-xl border border-border bg-card p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <span className="font-mono text-xs font-semibold text-muted-foreground">{n}</span>
+        <Icon className="h-4 w-4 text-muted-foreground/40" />
       </div>
-      <div className="rounded-xl border border-primary/20 bg-primary/[0.035] p-3.5">
-        <div className="flex items-center justify-between">
-          <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-primary">proposed fix</span>
-          <span className="font-mono text-[8px] text-primary">96%</span>
-        </div>
-        <pre className="mt-3 overflow-hidden font-mono text-[8.5px] leading-5 text-foreground/70">
-{`const key =
-  user.id ??
-  request.ip;
-
-if (!key) {
-  throw new Error("no key");
-}`}
-        </pre>
-        <p className="mt-2 font-mono text-[7.5px] text-muted-foreground/55">comment · not a commit</p>
-      </div>
+      <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
+      <p className="text-sm text-muted-foreground leading-relaxed">{copy}</p>
     </div>
   );
 }
 
-function ModelVisual() {
+function TrustItem({
+  icon: Icon,
+  title,
+  copy,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  copy: string;
+}) {
   return (
-    <div className="space-y-1.5">
-      {[
-        { name: "nemotron-3-ultra", role: "primary", active: true },
-        { name: "nemotron-3.5-lightning", role: "fallback", active: false },
-        { name: "llama-3.1-nemotron-70b", role: "fallback", active: false },
-      ].map((model) => (
-        <div key={model.name} className="flex items-center gap-2 rounded-lg border border-border/50 bg-white/[0.015] px-2.5 py-2">
-          <span className={`h-1.5 w-1.5 rounded-full ${model.active ? "bg-primary" : "bg-muted-foreground/30"}`} />
-          <span className="min-w-0 flex-1 truncate font-mono text-[9px] text-foreground/75">{model.name}</span>
-          <span className={`font-mono text-[7.5px] uppercase tracking-[0.08em] ${model.active ? "text-primary" : "text-muted-foreground/50"}`}>
-            {model.role}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function ReportVisual() {
-  return (
-    <div className="rounded-xl border border-border/60 bg-[#08090A] p-3.5">
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-muted-foreground">report / public</span>
-        <Globe2 className="h-3 w-3 text-muted-foreground/60" />
-      </div>
-      <div className="mt-3 grid grid-cols-4 gap-1.5">
-        {[
-          { k: "Q", v: 86 },
-          { k: "S", v: 94 },
-          { k: "P", v: 78 },
-          { k: "A", v: 82 },
-        ].map((s) => (
-          <div key={s.k} className="rounded-md border border-border/50 bg-white/[0.02] py-2 text-center">
-            <p className="font-mono text-[7px] text-muted-foreground/60">{s.k}</p>
-            <p className="mt-0.5 text-[13px] font-semibold text-foreground">{s.v}</p>
-          </div>
-        ))}
-      </div>
-      <div className="mt-3 space-y-1.5">
-        <div className="h-1 w-full rounded-full bg-border">
-          <div className="h-full w-[86%] rounded-full bg-primary/60" />
-        </div>
-        <div className="h-1 w-3/4 rounded-full bg-border">
-          <div className="h-full w-[74%] rounded-full bg-primary/30" />
-        </div>
+    <div className="flex items-start gap-3">
+      <Icon className="h-4 w-4 text-brand shrink-0" />
+      <div>
+        <p className="text-sm font-medium text-foreground">{title}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{copy}</p>
       </div>
     </div>
   );
 }
-
-function CliVisual() {
-  return (
-    <div className="rounded-xl border border-border/60 bg-[#08090A] p-3.5 font-mono text-[9px] leading-6">
-      <p className="text-muted-foreground/50">$ ccai analyze repo_8f2a</p>
-      <p className="text-foreground/75">◇ fetching repository…</p>
-      <p className="text-foreground/75">◇ reviewing with nemotron</p>
-      <p className="text-primary">◆ report ready · quality 86</p>
-      <p className="mt-1.5 text-muted-foreground/40">$ ccai fix repo_8f2a 184</p>
-    </div>
-  );
-}
-

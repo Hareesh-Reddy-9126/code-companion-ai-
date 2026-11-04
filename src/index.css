@@ -8,22 +8,22 @@
        COLOR SYSTEM — Semantic, not decorative
        ======================================== */
 
-    /* Core surfaces — deep near-black, warm */
-    --background: 0 0% 4%;
-    --background-elevated: 0 0% 6%;
-    --background-hover: 0 0% 8%;
-    --background-active: 0 0% 10%;
-    --foreground: 0 0% 96%;
-    --foreground-muted: 0 0% 55%;
-    --foreground-subtle: 0 0% 35%;
+    /* Core surfaces — deep charcoal with warmth */
+    --background: 225 20% 5%;
+    --background-elevated: 225 20% 7%;
+    --background-hover: 225 15% 9%;
+    --background-active: 225 15% 11%;
+    --foreground: 220 10% 95%;
+    --foreground-muted: 220 10% 55%;
+    --foreground-subtle: 220 10% 35%;
 
-    /* Brand — single refined indigo accent, nothing else competes */
-    --brand: 230 70% 55%;
-    --brand-hover: 230 75% 60%;
-    --brand-active: 230 65% 48%;
-    --brand-muted: 230 40% 50%;
-    --brand-subtle: 230 35% 50% / 0.08;
-    --brand-foreground: 0 0% 3%;
+    /* Brand — deep indigo, premium SaaS */
+    --brand: 240 85% 60%;
+    --brand-hover: 240 90% 65%;
+    --brand-active: 240 80% 52%;
+    --brand-muted: 240 50% 55%;
+    --brand-subtle: 240 40% 55% / 0.08;
+    --brand-foreground: 225 25% 5%;
 
     /* Semantic signals — used sparingly */
     --success: 140 60% 45%;
@@ -35,36 +35,35 @@
     --info: 200 85% 60%;
     --info-subtle: 200 60% 65% / 0.1;
 
-    /* Neutral — warm grays, not blue grays */
-    --neutral-0: 0 0% 96%;
-    --neutral-50: 0 0% 90%;
-    --neutral-100: 0 0% 82%;
-    --neutral-200: 0 0% 70%;
-    --neutral-300: 0 0% 55%;
-    --neutral-400: 0 0% 42%;
-    --neutral-500: 0 0% 32%;
-    --neutral-600: 0 0% 24%;
-    --neutral-700: 0 0% 18%;
-    --neutral-800: 0 0% 12%;
-    --neutral-900: 0 0% 7%;
-    --neutral-950: 0 0% 4%;
+    /* Neutral system */
+    --neutral-0: 220 10% 96%;
+    --neutral-50: 220 10% 90%;
+    --neutral-100: 220 10% 82%;
+    --neutral-200: 220 10% 70%;
+    --neutral-300: 220 10% 55%;
+    --neutral-400: 220 10% 42%;
+    --neutral-500: 220 10% 32%;
+    --neutral-600: 220 10% 24%;
+    --neutral-700: 220 10% 18%;
+    --neutral-800: 220 10% 12%;
+    --neutral-900: 220 10% 7%;
+    --neutral-950: 220 10% 4%;
 
-    /* Borders & dividers — hairline, subtle */
-    --border: 0 0% 12%;
-    --border-strong: 0 0% 16%;
-    --border-subtle: 0 0% 9%;
-    --divider: 0 0% 10%;
+    /* Borders */
+    --border: 225 15% 12%;
+    --border-strong: 225 15% 18%;
+    --border-subtle: 225 10% 9%;
+    --divider: 225 10% 10%;
 
-    /* Interactive surfaces */
-    --surface: 0 0% 6%;
-    --surface-hover: 0 0% 8%;
-    --surface-active: 0 0% 10%;
-    --surface-elevated: 0 0% 7%;
-    --surface-elevated-hover: 0 0% 9%;
+    /* Surfaces */
+    --surface: 225 20% 6%;
+    --surface-hover: 225 15% 8%;
+    --surface-active: 225 15% 10%;
+    --surface-elevated: 225 20% 7%;
+    --surface-elevated-hover: 225 15% 9%;
 
-    /* Focus ring — brand, not blue */
-    --focus: 230 70% 55%;
-    --focus-ring: 230 70% 55% / 0.35;
+    --focus: 240 85% 60%;
+    --focus-ring: 240 85% 60% / 0.35;
 
     /* Radius system — deliberate, not arbitrary */
     --radius-xs: 4px;
@@ -75,31 +74,31 @@
     --radius-2xl: 20px;
     --radius-full: 9999px;
 
-    /* Shadow system — subtle, physical, references: rgba(0,0,0,0.03-0.12) */
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 8px 12px rgba(0, 0, 0, 0.12);
-    --shadow-xl: 0 12px 20px rgba(0, 0, 0, 0.14);
-    --shadow-2xl: 0 16px 32px rgba(0, 0, 0, 0.16);
+    /* Shadow system — subtle, physical */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.07);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 12px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 12px 20px rgba(0, 0, 0, 0.12);
+    --shadow-2xl: 0 16px 32px rgba(0, 0, 0, 0.14);
 
-    /* Glow shadows for brand moments — subtle */
-    --glow-sm: 0 0 0 1px hsl(var(--brand) / 0.15), 0 0 6px hsl(var(--brand) / 0.06);
-    --glow-md: 0 0 0 1px hsl(var(--brand) / 0.2), 0 0 12px hsl(var(--brand) / 0.1);
-    --glow-lg: 0 0 0 1px hsl(var(--brand) / 0.25), 0 0 20px hsl(var(--brand) / 0.12);
+    /* Glow shadows for brand moments */
+    --glow-sm: 0 0 0 1px hsl(var(--brand) / 0.15), 0 0 6px hsl(var(--brand) / 0.05);
+    --glow-md: 0 0 0 1px hsl(var(--brand) / 0.2), 0 0 12px hsl(var(--brand) / 0.08);
+    --glow-lg: 0 0 0 1px hsl(var(--brand) / 0.25), 0 0 20px hsl(var(--brand) / 0.1);
 
     /* ========================================
        TYPOGRAPHY — Fluid scale, optical rhythm
        ======================================== */
 
     /* Font families */
-    --font-sans: "Instrument Sans", "Inter", system-ui, -apple-system, sans-serif;
-    --font-serif: "Instrument Serif", "Georgia", serif;
-    --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
-    --font-display: "Instrument Sans", "Inter", system-ui, -apple-system, sans-serif;
+    --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+    --font-serif: "Georgia", serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    --font-display: "Inter", system-ui, -apple-system, sans-serif;
 
-    /* Fluid type scale — headings with tight tracking, weight 400-500 */
-    --text-display: clamp(3rem, 5vw + 1rem, 5rem);
+    /* Fluid type scale — headings with tight tracking */
+    --text-display: clamp(3rem, 6vw + 1rem, 5.5rem);
     --text-h1: clamp(2.25rem, 3vw + 0.8rem, 3.5rem);
     --text-h2: clamp(1.75rem, 2.5vw + 0.6rem, 2.75rem);
     --text-h3: clamp(1.375rem, 2vw + 0.5rem, 2rem);
@@ -118,7 +117,7 @@
     --leading-loose: 1.8;
 
     /* Letter spacing — optical adjustments, tight on headings */
-    --tracking-tight: -0.03em;
+    --tracking-tight: -0.02em;
     --tracking-normal: 0;
     --tracking-wide: 0.02em;
     --tracking-wider: 0.08em;
@@ -130,29 +129,25 @@
     --weight-semibold: 600;
     --weight-bold: 700;
 
-    /* ========================================
-       SPACING — 4px base, harmonic progression
-       ======================================== */
+    /* Spacing — 4px base, harmonic progression */
     --space-0: 0;
-    --space-1: 0.25rem;  /* 4px */
-    --space-2: 0.5rem;   /* 8px */
-    --space-3: 0.75rem;  /* 12px */
-    --space-4: 1rem;     /* 16px */
-    --space-5: 1.25rem;  /* 20px */
-    --space-6: 1.5rem;   /* 24px */
-    --space-7: 1.75rem;  /* 28px */
-    --space-8: 2rem;     /* 32px */
-    --space-10: 2.5rem;  /* 40px */
-    --space-12: 3rem;    /* 48px */
-    --space-14: 3.5rem;  /* 56px */
-    --space-16: 4rem;    /* 64px */
-    --space-20: 5rem;    /* 80px */
-    --space-24: 6rem;    /* 96px */
-    --space-32: 8rem;    /* 128px */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-7: 1.75rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-14: 3.5rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+    --space-32: 8rem;
 
-    /* ========================================
-       MOTION — Spring physics, not easing
-       ======================================== */
+    /* Motion — 0.3s-0.4s cubic-bezier ease-out */
     --duration-instant: 0ms;
     --duration-fast: 150ms;
     --duration-normal: 300ms;
