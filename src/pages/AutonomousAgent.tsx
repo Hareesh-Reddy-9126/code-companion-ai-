@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/app/PageHeader";
 import { EmptyState } from "@/components/app/EmptyState";
-import { StatCard } from "@/components/StatCard";
 
 interface AutonomousFix {
   id: string;
@@ -38,12 +37,12 @@ interface Repo {
 }
 
 const statusStyles: Record<string, string> = {
-  pending: "border-border bg-secondary text-muted-foreground",
-  analyzing: "border-info/25 bg-info/10 text-info",
-  fixing: "border-warning/25 bg-warning/10 text-warning",
-  review: "border-warning/25 bg-warning/10 text-warning",
-  completed: "border-primary/25 bg-primary/10 text-primary",
-  failed: "border-destructive/25 bg-destructive/10 text-destructive",
+  pending: "border-border bg-card text-muted-foreground",
+  analyzing: "border-info bg-info/10 text-info",
+  fixing: "border-warning bg-warning/10 text-warning",
+  review: "border-warning bg-warning/10 text-warning",
+  completed: "border-brand bg-brand/10 text-brand",
+  failed: "border-destructive bg-destructive/10 text-destructive",
 };
 
 export default function AutonomousAgent() {
@@ -58,256 +57,178 @@ export default function AutonomousAgent() {
   const load = async () => {
     setLoading(true);
     const [fixRes, repoRes] = await Promise.all([
-      supabase.from("autonomous_fixes").select("*").order("created_at", { ascending: false }).limit(20),
-      supabase.from("repositories").select("id, repo_name").order("repo_name"),
+      supabase.from("agent_fixes").select("*").order("created_at", { ascending: false }).limit(20),
+      supabase.from("repositories").select("id, repo_name").order("repo_name", { ascending: true }),
     ]);
-    setFixes((fixRes.data ?? []) as AutonomousFix[]);
-    setRepos((repoRes.data ?? []) as Repo[]);
-    setSelectedRepo((current) => current || repoRes.data?.[0]?.id || "");
+    if (fixRes.data) setFixes(fixRes.data as any);
+    if (repoRes.data) setRepos(repoRes.data as any);
     setLoading(false);
+  };
+
+  const dispatch = async () => {
+    if (!selectedRepo || !prNumber) return;
+    setDispatching(true);
+    try {
+      const { error } = await supabase.from("agent_fixes").insert({
+        repo_name: selectedRepo,
+        pr_number: parseInt(prNumber, 10),
+        status: "pending",
+        issues_found: 0,
+        fixes_applied: 0,
+        confidence_score: 0,
+        created_at: new Date().toISOString(),
+      });
+      if (error) throw error;
+      toast({ title: "Agent dispatched", description: "Reviewing the PR and will post fix suggestions." });
+      setPrNumber("");
+      load();
+    } catch (error: any) {
+      toast({ title: "Dispatch failed", description: error.message, variant: "destructive" });
+    } finally {
+      setDispatching(false);
+    }
   };
 
   useEffect(() => {
     load();
   }, []);
 
-  const dispatch = async () => {
-    const pr = Number(prNumber);
-    if (!selectedRepo || !Number.isInteger(pr) || pr <= 0) {
-      toast({
-        title: "Missing details",
-        description: "Select a repository and enter a valid pull request number.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setDispatching(true);
-    const { data, error } = await supabase.functions.invoke("autonomous-fix", {
-      body: { repo_id: selectedRepo, pr_number: pr },
-    });
-    setDispatching(false);
-    if (error) {
-      toast({ title: "Agent failed", description: error.message, variant: "destructive" });
-    } else {
-      toast({
-        title: "Agent finished",
-        description: `${data?.fixes_found ?? 0} issues found, ${data?.fixes_applied ?? 0} fix comments posted.`,
-      });
-      setPrNumber("");
-      load();
-    }
-  };
-
-  const active = fixes.filter((fix) => fix.status === "analyzing" || fix.status === "fixing").length;
-  const posted = fixes.reduce((sum, fix) => sum + (fix.fixes_applied || 0), 0);
-  const confidence = fixes.length
-    ? Math.round(fixes.reduce((sum, fix) => sum + (fix.confidence_score || 0), 0) / fixes.length)
-    : 0;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="h-5 w-5 animate-spin text-brand" />
+      </div>
+    );
+  }
 
   return (
-    <div className="animate-slide-in">
+    <div className="relative">
       <PageHeader
-        group="Intelligence"
-        title="AI agent"
-        description="Reads a pull request, drafts fixes and posts each high-confidence suggestion as a GitHub PR comment. A human still decides what ships."
+        group="Workspace"
+        title="Autonomous agent"
+        description="The AI agent reads a pull request and posts fix suggestions as a GitHub review comment. A human approves every action."
         actions={
-          <Button variant="outline" onClick={load} disabled={loading}>
-            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
-            Refresh
+          <Button variant="outline" asChild>
+            <Link to="/repositories">
+              <span><Github className="h-3.5 w-3.5" /> Browse repositories</span>
+            </Link>
           </Button>
         }
       />
 
-      {!loading && (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <StatCard title="Active runs" value={active} icon={Bot} change="Analyzing or fixing" />
-          <StatCard title="Fix comments" value={posted} icon={GitPullRequest} change="Across the last 20 runs" />
-          <StatCard
-            title="Avg confidence"
-            value={fixes.length ? `${confidence}%` : "—"}
-            icon={Sparkles}
-            change={fixes.length ? "Mean of the last 20 runs" : "No runs yet"}
-          />
+      <section className="mt-8 rounded-xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Dispatch agent
+            </p>
+            <h2 className="mt-2 text-lg font-semibold text-foreground">
+              Request a fix
+            </h2>
+          </div>
+          <form onSubmit={(e) => { e.preventDefault(); dispatch(); }} className="flex w-full flex-col gap-3 sm:flex-row sm:items-end">
+            <Input
+              placeholder="Repository name (e.g. acme/platform)"
+              value={selectedRepo}
+              onChange={(e) => setSelectedRepo(e.target.value)}
+              className="flex-1"
+            />
+            <Input
+              placeholder="PR number (e.g. 184)"
+              value={prNumber}
+              onChange={(e) => setPrNumber(e.target.value)}
+              className="flex-1 sm:w-48"
+            />
+            <Button type="submit" size="sm" disabled={dispatching || !selectedRepo || !prNumber}>
+              {dispatching ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <>
+                  Dispatch <ArrowUpRight className="h-3 w-3" />
+                </>
+              )}
+            </Button>
+          </form>
+        </div>
+      </section>
+
+      {fixes.length === 0 ? (
+        <EmptyState
+          className="mt-8"
+          icon={Bot}
+          title="No agent runs yet"
+          description="Dispatch the agent on a pull request to see results here."
+          action={
+            <Button variant="outline" asChild>
+              <Link to="/repositories">Choose a repository</Link>
+            </Button>
+          }
+        />
+      ) : (
+        <div className="mt-8 grid gap-4">
+          <section className="rounded-xl border border-border bg-card overflow-hidden">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                    PR
+                  </th>
+                  <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Repository
+                  </th>
+                  <th className="px-4 py-3 text-left font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-right font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Issues
+                  </th>
+                  <th className="px-4 py-3 text-right font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Fixes
+                  </th>
+                  <th className="px-4 py-3 text-right" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {fixes.map((fix) => (
+                  <tr key={fix.id} className="group hover:bg-surface-hover">
+                    <td className="px-4 py-3">
+                      <span className="font-mono text-sm text-foreground">
+                        #{fix.pr_number}
+                      </span>
+                      <p className="mt-0.5 text-[10px] text-muted-foreground truncate max-w-[20ch]">
+                        {fix.pr_title || "Untitled PR"}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="font-mono text-sm text-muted-foreground">
+                        {fix.repo_name || "—"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full border px-2 py-0 font-mono text-[9px] uppercase tracking-wider ${statusStyles[fix.status]}`}
+                      >
+                        {fix.status.replace("_", " ")}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <span className="font-mono text-sm text-muted-foreground">{fix.issues_found}</span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <span className="font-mono text-sm text-brand">{fix.fixes_applied}</span>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <span className="font-mono text-[10px] text-muted-foreground">
+                        {Math.round(fix.confidence_score)}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
         </div>
       )}
-
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-        <section className="panel p-5">
-          <div className="flex items-center gap-2">
-            <Bot className="h-3.5 w-3.5 text-primary" />
-            <h2 className="text-[13.5px] font-medium text-foreground">Dispatch the agent</h2>
-          </div>
-          <p className="mt-1 text-[11.5px] leading-5 text-muted-foreground">
-            The agent reads the diff with your GitHub token. Fixes below 70%
-            confidence are not posted.
-          </p>
-
-          {loading ? (
-            <div className="flex items-center justify-center py-10">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            </div>
-          ) : repos.length === 0 ? (
-            <div className="mt-4 flex items-start gap-3 rounded-xl border border-warning/20 bg-warning/[0.04] p-4">
-              <Github className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
-              <div>
-                <p className="text-[12px] font-medium text-foreground">No repositories connected</p>
-                <p className="mt-1 text-[11px] leading-5 text-muted-foreground">
-                  Connect GitHub and sync at least one repository before the agent
-                  can read a pull request.
-                </p>
-                <Button size="sm" className="mt-3" asChild>
-                  <Link to="/repositories">
-                    <span>Connect a repository <ArrowUpRight className="h-3 w-3" /></span>
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_150px_auto]">
-                <select
-                  value={selectedRepo}
-                  onChange={(event) => setSelectedRepo(event.target.value)}
-                  className="h-10 w-full rounded-xl border border-input bg-white/[0.02] px-3 text-[12.5px] text-foreground focus-visible:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/25"
-                  aria-label="Repository"
-                >
-                  {repos.map((repo) => (
-                    <option key={repo.id} value={repo.id}>
-                      {repo.repo_name}
-                    </option>
-                  ))}
-                </select>
-                <Input
-                  type="number"
-                  min={1}
-                  placeholder="PR number"
-                  value={prNumber}
-                  onChange={(event) => setPrNumber(event.target.value)}
-                  className="h-10 text-[12.5px]"
-                  aria-label="Pull request number"
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" && !dispatching && prNumber) dispatch();
-                  }}
-                />
-                <Button onClick={dispatch} disabled={dispatching || !prNumber}>
-                  {dispatching ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Bot className="h-3.5 w-3.5" />}
-                  {dispatching ? "Working" : "Dispatch"}
-                </Button>
-              </div>
-              <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground/60">
-                Typical run: 30–60 seconds · comments only · no commits
-              </p>
-            </>
-          )}
-        </section>
-
-        <section className="panel p-5">
-          <p className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground">
-            The boundary
-          </p>
-          <div className="mt-3 space-y-3">
-            {[
-              {
-                icon: Github,
-                title: "Posts comments",
-                copy: "Each high-confidence fix becomes a PR comment with the current code and a suggested replacement.",
-              },
-              {
-                icon: AlertTriangle,
-                title: "Does not write code to your branch",
-                copy: "No commits are pushed and no pull request is merged. Nothing changes until a person applies it.",
-              },
-              {
-                icon: CheckCircle2,
-                title: "Confidence filter",
-                copy: "Only fixes scored 70 or above are posted. Lower-confidence findings stay in the run record.",
-              },
-            ].map((item) => (
-              <div key={item.title} className="flex gap-3 rounded-xl border border-border/60 bg-white/[0.015] p-3.5">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-secondary/50 text-primary">
-                  <item.icon className="h-3.5 w-3.5" />
-                </span>
-                <div>
-                  <p className="text-[12px] font-medium text-foreground">{item.title}</p>
-                  <p className="mt-0.5 text-[11px] leading-5 text-muted-foreground">{item.copy}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <section className="panel mt-4 overflow-hidden">
-        <div className="flex items-center justify-between border-b border-border/60 px-5 py-4">
-          <div className="flex items-center gap-2">
-            <GitPullRequest className="h-3.5 w-3.5 text-primary" />
-            <h2 className="text-[13.5px] font-medium text-foreground">Agent activity</h2>
-          </div>
-          <span className="font-mono text-[9.5px] uppercase tracking-[0.1em] text-muted-foreground">
-            Last {fixes.length} runs
-          </span>
-        </div>
-
-        {loading ? (
-          <div className="flex items-center justify-center py-14">
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
-          </div>
-        ) : fixes.length === 0 ? (
-          <div className="p-4">
-            <EmptyState
-              icon={Bot}
-              title="No agent runs yet"
-              description="Dispatch the agent on a pull request to see run status and the number of fix comments posted."
-              compact
-            />
-          </div>
-        ) : (
-          <div className="divide-y divide-border/50">
-            {fixes.map((fix) => (
-              <div
-                key={fix.id}
-                className="flex flex-col gap-2 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-secondary/50 text-muted-foreground">
-                    <GitPullRequest className="h-3.5 w-3.5" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-[12.5px] font-medium text-foreground">
-                      {fix.pr_title || `PR #${fix.pr_number}`}
-                    </p>
-                    <p className="mt-0.5 truncate font-mono text-[9px] uppercase tracking-[0.08em] text-muted-foreground">
-                      {fix.repo_name || "Repository"} · PR #{fix.pr_number} ·{" "}
-                      {new Date(fix.created_at).toLocaleString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-                  <span className="font-mono text-[9.5px] text-muted-foreground">
-                    {fix.issues_found} found / {fix.fixes_applied} posted
-                  </span>
-                  <span className="font-mono text-[9.5px] text-muted-foreground/60">
-                    {fix.confidence_score || 0}% conf.
-                  </span>
-                  <span
-                    className={`rounded-full border px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.1em] ${
-                      statusStyles[fix.status] || statusStyles.pending
-                    }`}
-                  >
-                    {fix.status}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
     </div>
   );
 }

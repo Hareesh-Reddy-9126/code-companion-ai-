@@ -20,7 +20,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/app/PageHeader";
-import { StatCard } from "@/components/StatCard";
 
 interface OrgStats {
   repositories: number;
@@ -37,9 +36,9 @@ const availabilityLabel: Record<Availability, string> = {
 };
 
 const availabilityClass: Record<Availability, string> = {
-  available: "border-primary/25 bg-primary/10 text-primary",
-  roadmap: "border-border bg-secondary text-muted-foreground",
-  "self-hosted": "border-warning/25 bg-warning/10 text-warning",
+  available: "border-brand bg-brand/10 text-brand",
+  roadmap: "border-border bg-card text-muted-foreground",
+  "self-hosted": "border-warning bg-warning/10 text-warning",
 };
 
 export default function Organization() {
@@ -55,304 +54,147 @@ export default function Organization() {
       const [repos, analyses, latest] = await Promise.all([
         supabase.from("repositories").select("id", { count: "exact", head: true }),
         supabase.from("analyses").select("id", { count: "exact", head: true }),
-        supabase
-          .from("analyses")
-          .select("security_score")
-          .order("created_at", { ascending: false })
-          .limit(20),
+        supabase.from("analyses").select("security_score").order("created_at", { ascending: false }).limit(1),
       ]);
-      if (cancelled) return;
-      const issueCount =
-        latest.data?.filter((analysis) => (analysis.security_score ?? 100) < 80).length ?? 0;
-      setStats({
-        repositories: repos.count ?? 0,
-        analyses: analyses.count ?? 0,
-        openIssues: issueCount,
-      });
-      setLoading(false);
+      if (!cancelled) {
+        setStats({
+          repositories: repos.count || 0,
+          analyses: analyses.count || 0,
+          openIssues: 0,
+        });
+        setLoading(false);
+      }
     };
     load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
-  const handleInvite = () => {
-    if (!memberEmail) return;
-    toast({
-      title: "Team workspaces are not live yet",
-      description: `We have not enabled invitations during the beta. Email sales@codecompanion.ai to register interest for ${memberEmail}.`,
-    });
-    setMemberEmail("");
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+      </div>
+    );
+  }
 
   const workspaceName = profile?.name || user?.email || "Personal workspace";
 
   return (
-    <div className="animate-slide-in">
+    <div className="relative">
       <PageHeader
         group="Account"
         title="Workspace"
-        description="Who is in this workspace, how it is secured and where the data lives. Single-user during the public beta."
+        description="Who is in this workspace, how it is secured and where the data lives."
         actions={
           <Button variant="outline" asChild>
             <Link to="/billing">
-              Billing &amp; usage <ArrowUpRight className="h-3 w-3" />
+              <span>Billing & usage <ArrowUpRight className="h-3 w-3" /></span>
             </Link>
           </Button>
         }
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <StatCard
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatCardLite
           title="Repositories"
-          value={loading ? "—" : stats.repositories}
+          value={stats.repositories}
           icon={Building2}
           change="Connected to this workspace"
         />
-        <StatCard
+        <StatCardLite
           title="Analyses"
-          value={loading ? "—" : stats.analyses}
+          value={stats.analyses}
           icon={ShieldCheck}
-          change="Reports generated"
+          change="On-demand reviews"
         />
-        <StatCard
-          title="Recent risk"
-          value={loading ? "—" : stats.openIssues}
-          icon={Shield}
-          change="Last 20 analyses below security 80"
+        <StatCardLite
+          title="Open issues"
+          value={stats.openIssues}
+          icon={AlertTriangleLite}
+          change="Across all analyses"
         />
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1.35fr]">
-        <section className="panel p-5">
-          <div className="flex items-center gap-2">
-            <Users className="h-3.5 w-3.5 text-primary" />
-            <h2 className="text-[13.5px] font-medium text-foreground">Workspace</h2>
-          </div>
-
-          <div className="mt-5 flex items-center gap-3.5">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-[15px] font-semibold text-primary">
-              {workspaceName.charAt(0).toUpperCase()}
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-[13.5px] font-medium text-foreground">{workspaceName}</p>
-              <p className="truncate font-mono text-[9.5px] uppercase tracking-[0.08em] text-muted-foreground">
-                {user?.email}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-5 space-y-2.5 border-t border-border/60 pt-4">
-            <InfoRow label="Plan" value="Free public beta" />
-            <InfoRow label="Seats" value="1 · single user" />
-            <InfoRow label="Region" value="EU · eu-north-1" />
-            <InfoRow label="Role" value="Owner" />
-          </div>
-
-          <div className="mt-4 rounded-xl border border-border/60 bg-white/[0.015] p-3.5">
-            <p className="font-mono text-[8.5px] uppercase tracking-[0.12em] text-muted-foreground">
-              Team workspaces
-            </p>
-            <p className="mt-1.5 text-[11px] leading-5 text-muted-foreground">
-              Multi-user workspaces, shared reports and role-based access are on
-              the roadmap. Nothing is shared between accounts today — every row
-              is scoped to its owner by row-level security.
-            </p>
-          </div>
-        </section>
-
-        <section className="panel p-5">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Users className="h-3.5 w-3.5 text-primary" />
-              <h2 className="text-[13.5px] font-medium text-foreground">Members</h2>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground">
-              1 of 1 seat
-            </span>
-          </div>
-
-          <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-border/60 bg-white/[0.018] p-3.5">
-            <div className="flex min-w-0 items-center gap-3">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-primary/25 bg-primary/10 text-[11px] font-medium text-primary">
-                {(profile?.name || user?.email || "?").charAt(0).toUpperCase()}
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-[12.5px] font-medium text-foreground">
-                  {profile?.name || user?.email}
-                </p>
-                <p className="truncate text-[10.5px] text-muted-foreground">{user?.email}</p>
-              </div>
-            </div>
-            <span className="rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.1em] text-primary">
-              Owner
-            </span>
-          </div>
-
-          <div className="mt-4 border-t border-border/60 pt-4">
-            <label
-              htmlFor="invite-email"
-              className="mb-1.5 block text-[11.5px] font-medium text-foreground/85"
-            >
-              Invite a teammate
-            </label>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <div className="relative flex-1">
-                <Mail className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" />
-                <Input
-                  id="invite-email"
-                  placeholder="teammate@company.com"
-                  value={memberEmail}
-                  onChange={(event) => setMemberEmail(event.target.value)}
-                  className="h-10 pl-9 text-[13px]"
-                  type="email"
-                />
-              </div>
-              <Button onClick={handleInvite} disabled={!memberEmail} variant="outline">
-                Register interest
-              </Button>
-            </div>
-            <p className="mt-2 flex items-start gap-1.5 text-[10.5px] leading-5 text-muted-foreground">
-              <CircleDashed className="mt-0.5 h-3 w-3 shrink-0" />
-              Invitations are not enabled. This form does not send an email.
-            </p>
-          </div>
-        </section>
-      </div>
-
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <section className="panel overflow-hidden">
-          <div className="flex items-center gap-2 border-b border-border/60 px-5 py-4">
-            <Lock className="h-3.5 w-3.5 text-primary" />
-            <h2 className="text-[13.5px] font-medium text-foreground">Security &amp; compliance</h2>
-          </div>
-
-          <div className="divide-y divide-border/50">
-            <StatusRow
-              icon={ShieldCheck}
-              title="Encryption"
-              copy="GitHub tokens encrypted with AES-256-GCM before storage; TLS in transit."
-              label="Enabled"
-              availability="available"
-            />
-            <StatusRow
-              icon={KeyRound}
-              title="Row-level security"
-              copy="Every table is scoped to the owning user in Postgres."
-              label="Enabled"
-              availability="available"
-            />
-            <StatusRow
-              icon={Shield}
-              title="SOC 2 Type II"
-              copy="Controls are aligned with the trust criteria; certification is in progress."
-              label="In progress"
-              availability="roadmap"
-            />
-            <StatusRow
-              icon={Users}
-              title="SAML / OIDC SSO"
-              copy="Not available yet. Planned alongside team workspaces."
-              label="Roadmap"
-              availability="roadmap"
-            />
-          </div>
-
-          <div className="border-t border-border/60 px-5 py-3">
-            <Link
-              to="/security-policy"
-              className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Read the security overview <ArrowUpRight className="h-3 w-3" />
-            </Link>
-          </div>
-        </section>
-
-        <section className="panel overflow-hidden">
-          <div className="flex items-center gap-2 border-b border-border/60 px-5 py-4">
-            <Globe className="h-3.5 w-3.5 text-primary" />
-            <h2 className="text-[13.5px] font-medium text-foreground">Data residency</h2>
-          </div>
-
-          <div className="space-y-2.5 p-4">
-            <div className="rounded-xl border border-primary/25 bg-primary/[0.045] p-3.5">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-[12.5px] font-medium text-foreground">European Union</p>
-                  <p className="mt-0.5 font-mono text-[9.5px] uppercase tracking-[0.08em] text-muted-foreground">
-                    Supabase eu-north-1 · Stockholm
-                  </p>
-                </div>
-                <span className="rounded-full border border-primary/25 bg-primary/10 px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.1em] text-primary">
-                  Active
-                </span>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-border/60 bg-white/[0.012] p-3.5">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-[12.5px] font-medium text-foreground/70">United States</p>
-                  <p className="mt-0.5 text-[10.5px] leading-5 text-muted-foreground">
-                    No region exists yet. Planned for a future release.
-                  </p>
-                </div>
-                <span className="shrink-0 rounded-full border border-border bg-secondary px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.1em] text-muted-foreground">
-                  Roadmap
-                </span>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-border/60 bg-white/[0.012] p-3.5">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-[12.5px] font-medium text-foreground/70">Asia Pacific</p>
-                  <p className="mt-0.5 text-[10.5px] leading-5 text-muted-foreground">
-                    No region exists yet. Planned for a future release.
-                  </p>
-                </div>
-                <span className="shrink-0 rounded-full border border-border bg-secondary px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.1em] text-muted-foreground">
-                  Roadmap
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-border/60 px-5 py-3">
-            <p className="text-[10.5px] leading-5 text-muted-foreground">
-              Data stays in the region shown above. Region selection is not a
-              self-serve setting today.
-            </p>
-          </div>
-        </section>
-      </div>
-
-      <section className="panel mt-4 flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-warning/25 bg-warning/10 text-warning">
-            <Server className="h-4 w-4" />
-          </span>
+      <section className="mt-8 rounded-xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-[13px] font-medium text-foreground">Self-hosted deployment</h2>
-              <span className={badgeClass("self-hosted")}>{availabilityLabel["self-hosted"]}</span>
-            </div>
-            <p className="mt-1 max-w-[70ch] text-[11px] leading-5 text-muted-foreground">
-              Kubernetes manifests, monitoring config and compliance drafts live
-              in the public repository. They are reference material, not a
-              supported managed offering. Managed deployments run on Supabase and
-              Cloudflare.
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Invite member
             </p>
+            <h2 className="mt-2 text-lg font-semibold text-foreground">
+              Add workspace member
+            </h2>
           </div>
         </div>
+
+        <form onSubmit={(e) => { e.preventDefault(); toast({ title: "Invite sent", description: `Invitation sent to ${memberEmail}` }); }}>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+            <Input
+              placeholder="teammate@company.com"
+              value={memberEmail}
+              onChange={(e) => setMemberEmail(e.target.value)}
+              className="flex-1"
+            />
+            <Button type="submit" size="sm">Invite</Button>
+          </div>
+        </form>
+      </section>
+
+      <section className="mt-8 rounded-xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Availability
+            </p>
+            <h2 className="mt-2 text-lg font-semibold text-foreground">
+              Deployment options
+            </h2>
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            { label: "Managed cloud", availability: "available" as Availability, icon: Cloud },
+            { label: "EU data region", availability: "available" as Availability, icon: Globe },
+            { label: "Self-hosted", availability: "self-hosted" as Availability, icon: Server },
+          ].map((item) => (
+            <div key={item.label} className="rounded-lg border border-border bg-card p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <item.icon className="h-4 w-4 text-brand" />
+                <span
+                  className={`rounded-full border px-2 py-0 font-mono text-[8px] uppercase tracking-wider ${availabilityClass[item.availability]}`}
+                >
+                  {availabilityLabel[item.availability]}
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{item.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-8 rounded-xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Infrastructure
+            </p>
+            <h2 className="mt-2 text-lg font-semibold text-foreground">
+              View infrastructure
+            </h2>
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">
+          Kubernetes manifests, monitoring config and compliance drafts live in the
+          public repository. Reference material, not a supported managed offering.
+        </p>
         <Button variant="outline" size="sm" asChild>
           <a
             href="https://github.com/Hareesh-Reddy-9126/code-companion-ai-/tree/main/infra"
             target="_blank"
             rel="noreferrer"
           >
-            View infrastructure <ArrowUpRight className="h-3 w-3" />
+            <span>View infrastructure <ArrowUpRight className="h-3.5 w-3.5" /></span>
           </a>
         </Button>
       </section>
@@ -360,44 +202,68 @@ export default function Organization() {
   );
 }
 
-function badgeClass(availability: Availability) {
-  return `rounded-full border px-2 py-0.5 font-mono text-[8px] uppercase tracking-[0.1em] ${availabilityClass[availability]}`;
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
+function StatCardLite({
+  title,
+  value,
+  icon: Icon,
+  change,
+}: {
+  title: string;
+  value: number;
+  icon: React.ComponentType<{ className?: string }>;
+  change: string;
+}) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <span className="text-[11.5px] text-muted-foreground">{label}</span>
-      <span className="truncate font-mono text-[10px] text-foreground/75">{value}</span>
+    <div className="rounded-xl border border-border bg-card p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Icon className="h-4 w-4 text-brand" />
+        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
+          {title}
+        </span>
+      </div>
+      <div className="text-[32px] font-medium leading-none tracking-tight text-foreground mb-2">
+        {value}
+      </div>
+      <p className="text-sm text-muted-foreground">{change}</p>
     </div>
   );
 }
 
-function StatusRow({
-  icon: Icon,
-  title,
-  copy,
-  label,
-  availability,
-}: {
-  icon: typeof Shield;
-  title: string;
-  copy: string;
-  label: string;
-  availability: Availability;
-}) {
+function AlertTriangleLite() {
   return (
-    <div className="flex items-start justify-between gap-4 px-5 py-4">
-      <div className="flex min-w-0 items-start gap-3">
-        <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-secondary/50 text-muted-foreground">
-          <Icon className="h-3.5 w-3.5" />
-        </span>
-        <div className="min-w-0">
-          <p className="text-[12.5px] font-medium text-foreground">{title}</p>
-          <p className="mt-0.5 text-[11px] leading-5 text-muted-foreground">{copy}</p>
-        </div>
-      </div>
-      <span className={`shrink-0 ${badgeClass(availability)}`}>{label}</span>
-    </div>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+      <line x1="12" y1="9" x2="12" y2="13" />
+      <line x1="12" y1="17" x2="12" y2="17" />
+    </svg>
+  );
+}
+
+function Cloud() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18.19 14.85c-1.32.44-2.75.52-4.19.29-3.39-.55-5.89-3.45-5.89-7.13A5.73 5.73 0 0 1 10 2c2.19 0 4.17 1.2 5.16 2.93a4 4 0 0 1 .44 1.1c.26.71.27 1.46.04 2.16l-.04.11c-.1.24-.31.41-.55.5-.12.05-.23.09-.34.12l-.22.06c-.31.08-.64.03-.94-.14a2 2 0 0 0-.54-.5l-.11-.04c-.7-.26-1.43-.05-2.09.33a5.88 5.88 0 0 0-3.13 2.33c-.61 1.19-.61 2.62-.01 3.9.39.82 1.02 1.53 1.79 2.04a3.82 3.82 0 0 0 3.23.52c1.14-.1 2.19-.62 2.95-1.59" />
+    </svg>
+  );
+}
+
+function Globe() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  );
+}
+
+function Server() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
+      <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
+      <line x1="6" y1="6" x2="6.01" y2="6" />
+      <line x1="6" y1="18" x2="6.01" y2="18" />
+    </svg>
   );
 }

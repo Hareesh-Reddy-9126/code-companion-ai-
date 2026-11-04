@@ -66,55 +66,33 @@ export default function SettingsPage() {
     if (error) {
       toast({ title: "Could not update password", description: error.message, variant: "destructive" });
     } else {
-      setPassword("");
       toast({ title: "Password updated" });
+      setPassword("");
     }
   };
 
   const connectGitHub = async () => {
     setConnecting(true);
     try {
-      const redirectUri = `${window.location.origin}/auth/github/callback`;
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/github-auth-url?redirect_uri=${encodeURIComponent(redirectUri)}`,
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          },
-        },
-      );
-      const data = await res.json();
-      if (!res.ok || data.error) {
-        setConnecting(false);
-        toast({
-          title: "GitHub is not configured",
-          description: data.error || "The authorization endpoint returned an error.",
-          variant: "destructive",
-        });
-        return;
-      }
-      const state = crypto.randomUUID();
-      sessionStorage.setItem("github_oauth_state", state);
-      window.location.href = `https://github.com/login/oauth/authorize?client_id=${data.client_id}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=repo&state=${state}`;
+      const { error } = await supabase.functions.invoke("github-app-auth", { body: {} });
+      if (error) throw error;
+      navigate("/repositories");
     } catch (error: any) {
+      toast({ title: "GitHub connection failed", description: error.message, variant: "destructive" });
+    } finally {
       setConnecting(false);
-      toast({ title: "Could not start GitHub OAuth", description: error.message, variant: "destructive" });
     }
   };
 
   const disconnectGitHub = async () => {
-    if (!window.confirm("Disconnect GitHub? Stored credentials will be deleted and analyses will stop until you reconnect.")) {
-      return;
-    }
     setDisconnecting(true);
     try {
-      const { error } = await supabase.functions.invoke("revoke-github", { body: {} });
+      const { error } = await supabase.from("profiles").update({ github_username: null }).eq("user_id", user?.id);
       if (error) throw error;
       await refreshProfile();
-      toast({ title: "GitHub disconnected", description: "The stored token has been deleted." });
+      toast({ title: "GitHub disconnected" });
     } catch (error: any) {
-      toast({ title: "Failed to disconnect", description: error.message, variant: "destructive" });
+      toast({ title: "Could not disconnect", description: error.message, variant: "destructive" });
     } finally {
       setDisconnecting(false);
     }
@@ -125,208 +103,112 @@ export default function SettingsPage() {
     navigate("/login");
   };
 
+  const firstName = profile?.name?.split(" ")[0] || user?.email?.split("@")[0];
+
   return (
-    <div className="animate-slide-in">
+    <div className="relative">
       <PageHeader
         group="Account"
         title="Settings"
-        description="Your profile, GitHub connection and account security."
+        description={`Manage your account, ${firstName}.`}
+        actions={
+          <Button variant="outline" asChild onClick={handleSignOut}>
+            <span>Sign out <LogOut className="h-3.5 w-3.5" /></span>
+          </Button>
+        }
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="panel p-5">
-          <div className="flex items-center gap-2">
-            <User className="h-3.5 w-3.5 text-primary" />
-            <h2 className="text-[13.5px] font-medium text-foreground">Profile</h2>
+      <section className="mt-8 rounded-xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Profile
+            </p>
+            <h2 className="mt-2 text-lg font-semibold text-foreground">Account details</h2>
           </div>
-          <p className="mt-1 text-[11.5px] leading-5 text-muted-foreground">
-            This name appears on reports and in the workspace switcher.
-          </p>
+        </div>
 
-          <div className="mt-5 space-y-4">
-            <Field
-              icon={User}
-              label="Full name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Your name"
-              autoComplete="name"
-            />
-            <Field
-              icon={Mail}
-              label="Email"
-              value={user?.email || ""}
-              disabled
-              hint="Managed by Supabase Auth"
-            />
-          </div>
-
-          <Button className="mt-5" onClick={saveName} disabled={saving}>
-            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-            Save profile
+        <form onSubmit={(e) => { e.preventDefault(); saveName(); }} className="space-y-4">
+          <Input
+            label="Full name"
+            type="text"
+            placeholder="Jane Doe"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <Button type="submit" size="sm" disabled={saving}>
+            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} Save
           </Button>
-        </section>
+        </form>
+      </section>
 
-        <section className="panel p-5">
-          <div className="flex items-center gap-2">
-            <Github className="h-3.5 w-3.5 text-primary" />
-            <h2 className="text-[13.5px] font-medium text-foreground">GitHub connection</h2>
+      <section className="mt-8 rounded-xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Password
+            </p>
+            <h2 className="mt-2 text-lg font-semibold text-foreground">Change password</h2>
           </div>
+        </div>
 
-          {profile?.github_username ? (
-            <>
-              <div className="mt-4 flex items-center gap-3 rounded-xl border border-border/60 bg-white/[0.018] p-3.5">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
-                  <Github className="h-4 w-4" />
-                </span>
-                <div className="min-w-0">
-                  <p className="truncate text-[12.5px] font-medium text-foreground">
-                    Connected as @{profile.github_username}
-                  </p>
-                  <p className="mt-0.5 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-primary">
-                    <ShieldCheck className="h-3 w-3" /> Token encrypted at rest
-                  </p>
-                </div>
-              </div>
-              <p className="mt-3 text-[11.5px] leading-5 text-muted-foreground">
-                The OAuth token is encrypted with AES-256-GCM and is only
-                decrypted inside edge functions that call GitHub.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={connectGitHub} disabled={connecting}>
-                  {connecting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Github className="h-3.5 w-3.5" />}
-                  Reconnect
-                </Button>
-                <Button variant="ghost" size="sm" onClick={disconnectGitHub} disabled={disconnecting}>
-                  {disconnecting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LogOut className="h-3.5 w-3.5" />}
-                  Disconnect
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="mt-3 text-[11.5px] leading-5 text-muted-foreground">
-                Connect GitHub to sync repositories and let the agent read pull
-                request diffs. Access can be revoked here or from GitHub at any
-                time.
-              </p>
-              <Button className="mt-4" size="sm" onClick={connectGitHub} disabled={connecting}>
-                {connecting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Github className="h-3.5 w-3.5" />}
-                Connect GitHub
+        <form onSubmit={(e) => { e.preventDefault(); updatePassword(); }} className="space-y-4">
+          <Input
+            label="New password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <Button type="submit" size="sm" disabled={savingPassword}>
+            {savingPassword ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />} Save
+          </Button>
+        </form>
+      </section>
+
+      <section className="mt-8 rounded-xl border border-border bg-card p-6 sm:p-8">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+              Connected accounts
+            </p>
+            <h2 className="mt-2 text-lg font-semibold text-foreground">GitHub</h2>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card">
+            <Github className="h-3.5 w-3.5" />
+          </span>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-foreground">
+              {profile?.github_username ? `@${profile.github_username}` : "Not connected"}
+            </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              {profile?.github_username ? "Connected via OAuth" : "Connect to analyze repositories"}
+            </p>
+          </div>
+          <div className="ml-auto flex gap-2">
+            {profile?.github_username ? (
+              <Button variant="outline" size="sm" disabled={disconnecting} onClick={disconnectGitHub}>
+                {disconnecting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Disconnect"}
               </Button>
-            </>
-          )}
-        </section>
-
-        <section className="panel p-5">
-          <div className="flex items-center gap-2">
-            <KeyRound className="h-3.5 w-3.5 text-primary" />
-            <h2 className="text-[13.5px] font-medium text-foreground">Password</h2>
+            ) : (
+              <Button size="sm" disabled={connecting} onClick={connectGitHub}>
+                {connecting ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <>
+                    <KeyRound className="h-3.5 w-3.5" /> Connect
+                  </>
+                )}
+              </Button>
+            )}
           </div>
-          <p className="mt-1 text-[11.5px] leading-5 text-muted-foreground">
-            Set a new password for this account. Automated reset email is not
-            enabled during the beta.
-          </p>
-
-          <div className="mt-5">
-            <Field
-              icon={Lock}
-              label="New password"
-              type="password"
-              placeholder="At least 6 characters"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete="new-password"
-              hint="min 6 characters"
-            />
-          </div>
-
-          <Button
-            className="mt-5"
-            variant="outline"
-            onClick={updatePassword}
-            disabled={savingPassword || !password}
-          >
-            {savingPassword ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Lock className="h-3.5 w-3.5" />}
-            Update password
-          </Button>
-
-          <p className="mt-4 rounded-lg border border-border/60 bg-white/[0.015] p-3 text-[10.5px] leading-5 text-muted-foreground">
-            Locked out? Email{" "}
-            <a href="mailto:support@codecompanion.ai" className="text-primary hover:underline">
-              support@codecompanion.ai
-            </a>
-            . Recovery is handled manually until SMTP is configured.
-          </p>
-        </section>
-
-        <section className="panel p-5">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-            <h2 className="text-[13.5px] font-medium text-foreground">Session</h2>
-          </div>
-          <div className="mt-4 space-y-2.5">
-            <InfoRow label="Account" value={user?.email || "—"} />
-            <InfoRow
-              label="Member since"
-              value={
-                user?.created_at
-                  ? new Date(user.created_at).toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })
-                  : "—"
-              }
-            />
-            <InfoRow label="Plan" value="Free public beta" />
-            <InfoRow label="Region" value="EU · eu-north-1" />
-          </div>
-
-          <Button variant="outline" size="sm" className="mt-5" onClick={handleSignOut}>
-            <LogOut className="h-3.5 w-3.5" /> Sign out
-          </Button>
-
-          <a
-            href="https://github.com/Hareesh-Reddy-9126/code-companion-ai-"
-            target="_blank"
-            rel="noreferrer"
-            className="mt-4 flex items-center gap-1.5 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Review the source code <ArrowUpRight className="h-3 w-3" />
-          </a>
-        </section>
-      </div>
-    </div>
-  );
-}
-
-function Field({
-  icon: Icon,
-  label,
-  hint,
-  ...props
-}: { icon: typeof User; label: string; hint?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
-  const id = `field-${label.toLowerCase().replace(/\s+/g, "-")}`;
-  return (
-    <div>
-      <label htmlFor={id} className="mb-1.5 flex items-center justify-between text-[11.5px] font-medium text-foreground/85">
-        {label}
-        {hint && <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-muted-foreground/60">{hint}</span>}
-      </label>
-      <div className="relative">
-        <Icon className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" />
-        <Input id={id} className="h-10 pl-9 text-[13px]" {...props} />
-      </div>
-    </div>
-  );
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-3 border-b border-border/40 pb-2.5 last:border-0 last:pb-0">
-      <span className="text-[11.5px] text-muted-foreground">{label}</span>
-      <span className="truncate font-mono text-[10px] text-foreground/75">{value}</span>
+        </div>
+      </section>
     </div>
   );
 }
